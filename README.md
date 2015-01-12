@@ -99,17 +99,15 @@ countStyle =
   ...
 ```
 
-The first thing I want you to notice about this code is that it is entirely
-declarative. Take in a `Model` and produce some `Html`. That is it. At no point
-do we mutate the DOM, giving the language and libraries [much more freedom to
-make clever optimizations][elm-html]. Furthermore, `view` is a plain old
-function so we can get the full power of Elm&rsquo;s module system, test
-frameworks, and libraries when creating views.
+The tricky thing about our `view` function is the `Signal.send actionChannel`
+part. We will dive into that in the next section! For now, I just want you to
+notice that **this code is entirely declarative**. We take in a `Model` and
+produce some `Html`. That is it. At no point do we mutate the DOM manually,
+which gives the library [much more freedom to make clever optimizations][elm-html]
+and actually makes rendering *faster* overall. It is crazy. Furthermore, `view`
+is a plain old function so we can get the full power of Elm&rsquo;s module
+system, test frameworks, and libraries when creating views.
 
-<span style="color:grey">
-(The tricky thing about our `view` function is the `Signal.send actionChannel`
-part. We will dive into that in the next section.)
-</span>
 
 This pattern is the essense of architecting Elm programs. Every example we see
 from now on will be a slight variation on this basic pattern: `Model`, `update`,
@@ -117,6 +115,7 @@ from now on will be a slight variation on this basic pattern: `Model`, `update`,
 
 ## Aside: Driving your App with Signals
 
+Now to understand the `Signal.send actionChannel` snippet.
 So far we have only been talking about pure functions and immutable data. This
 is great, but we also need to react to events in the world. This is the role of
 [signals][] in Elm. A signal is a value that changes over time, and it lets us
