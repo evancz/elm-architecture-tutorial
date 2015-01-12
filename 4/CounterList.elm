@@ -68,12 +68,12 @@ view model =
 
 viewCounter : (ID, Counter.Model) -> Html
 viewCounter (id, model) =
-  let channels =
-        Counter.Channels
+  let context =
+        Counter.Context
           (LC.create (Modify id) actionChannel)
           (LC.create (always (Remove id)) actionChannel)
   in
-      Counter.view channels model
+      Counter.viewWithRemoveButton context model
 
 
 -- SIGNALS

@@ -419,31 +419,139 @@ before and add a new `viewWithRemoveButton` function that provides a slightly
 different view of our underlying `Model`:
 
 ```elm
-module Counter (Model, init, Action, update, view, viewWithRemoveButton) where
+module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context) where
 
 ...
 
-viewWithRemoveButton
+type alias Context =
+    { actionChan : LocalChannel Action
+    , deleteChan : LocalChannel ()
+    }
+
+viewWithRemoveButton : Context -> Model -> Html
+viewWithRemoveButton context model =
+  div []
+    [ button [ onClick (send context.actionChan Decrement) ] [ text "-" ]
+    , div [ countStyle ] [ text (toString model) ]
+    , button [ onClick (send context.actionChan Increment) ] [ text "+" ]
+    , div [ countStyle ] []
+    , button [ onClick (send context.deleteChan ()) ] [ text "X" ]
+    ]
 ```
+
+The `viewWithRemoveButton` function just adds one extra button. The
+interesting thing here is that we have multiple channels we need to send
+messages to now. Instead of just updating this counter, we also pass in a way
+to say &ldquo;delete me!&rdquo; How that happens is the responsibility of
+whoever owns the counter.
 
 This is pretty cool. We do not need to duplicate any code or do any crazy
 subtyping or overloading. We just add another `view` function to the public
 API to expose new functionality!
 
+So now we get to the `CounterList` module, that actually puts all the
+individual counters together. The `Model` is the same as in example 3.
 
-## Additional Comments
+```elm
+type alias Model =
+    { counters : List ( ID, Counter.Model )
+    , nextID : ID
+    }
 
-Given how many conflicting definitions of [MVC][] are floating about in the
-world, I am not sure how valuable it is to try to see connections besides
-making the simple observation that these things look related.
+type alias ID = Int
+```
 
-The architecture I outlined here is made up entirely of immutable data and
-[functions with no side-effects][pure], making it uniquely easy to reuse and
-test code. I think it is much more important to focus on the specific patterns
-and techniques than to get obsessed with relating it to other stuff, especially
-if that other stuff has a contested defintion and worse properties when it
-comes to testing, reuse, and modularity.
+Our set of actions is a bit different. Instead of removing any old counter, we
+want to remove a specific one, so the `Remove` case now holds an ID.
 
-[MVC]: http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+```elm
+type Action
+    = Insert
+    | Remove ID
+    | Modify ID Counter.Action
+```
+
+The `update` function is pretty similar to example 4 as well.
+
+```
+update : Action -> Model -> Model
+update action model =
+  case action of
+    Insert ->
+      { model |
+          counters <- ( model.nextID, Counter.init 0 ) :: model.counters,
+          nextID <- model.nextID + 1
+      }
+
+    Remove id ->
+      { model |
+          counters <- List.filter (\(counterID, _) -> counterID /= id) model.counters
+      }
+
+    Modify id counterAction ->
+      let updateCounter (counterID, counterModel) =
+            if counterID == id
+                then (counterID, Counter.update counterAction counterModel)
+                else (counterID, counterModel)
+      in
+          { model | counters <- List.map updateCounter model.counters }
+```
+
+In the case of `Remove`, we got through the list of counters and keep
+everything that has a non-matching ID. Otherwise, the cases are quite close to
+how they were before.
+
+Finally, we put it all together in the `view`:
+
+```elm
+view : Model -> Html
+view model =
+  let insert = button [ onClick (Signal.send actionChannel Insert) ] [ text "Add" ]
+  in
+      div [] (insert :: List.map viewCounter model.counters)
+
+viewCounter : (ID, Counter.Model) -> Html
+viewCounter (id, model) =
+  let context =
+        Counter.Context
+          (LC.create (Modify id) actionChannel)
+          (LC.create (always (Remove id)) actionChannel)
+  in
+      Counter.viewWithRemoveButton context model
+```
+
+In our `viewCounter` function, we construct the `Counter.Context` to pass in
+all the nesessary local channels. In both cases we annotate each
+`Counter.Action` so that we know which counter to modify or remove.
+
+## Big Lessons So Far
+
+**Basic Pattern** &mdash; Everything is built around a `Model`, a way to
+`update` that model, and a way to `view` that model. Everything is a variation
+on this basic pattern.
+
+**Nesting Modules** &mdash; A [local-channel][] makes it easy to nest our
+basic pattern, hiding implementation details entirely. We can nest this
+pattern arbitrarily deep, and each level only needs to know about what is
+going on one level lower.
+
+**Adding Context** &mdash; Sometimes to `update` or `view` our model, extra
+information is needed. We can always add some `Context` to these functions and
+pass in all the additional information we need without complicating our
+`Model`.
+
+```elm
+update : Context -> Action -> Model -> Model
+view : Context' -> Model -> Html
+```
+
+At every level of nesting we can derive the specific `Context` needed for each
+submodule.
+
+**Testing is Easy** &mdash; All of the functions we have created are
+[pure functions][pure]. That makes it extremely easy to test your `update`
+function. There is no special initialization or mocking or configuration step,
+you just call the function with the arguments you would like to test.
+
 [pure]: http://en.wikipedia.org/wiki/Pure_function
 

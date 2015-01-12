@@ -1,4 +1,4 @@
-module Counter (Model, init, Action, update, Channels, view) where
+module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context) where
 
 import Html (..)
 import Html.Attributes (..)
@@ -28,20 +28,29 @@ update action model =
 
 -- VIEW
 
-type alias Channels =
-    { actions : LocalChannel Action
-    , delete : LocalChannel ()
+view : LocalChannel Action -> Model -> Html
+view channel model =
+  div []
+    [ button [ onClick (send channel Decrement) ] [ text "-" ]
+    , div [ countStyle ] [ text (toString model) ]
+    , button [ onClick (send channel Increment) ] [ text "+" ]
+    ]
+
+
+type alias Context =
+    { actionChan : LocalChannel Action
+    , deleteChan : LocalChannel ()
     }
 
 
-view : Channels -> Model -> Html
-view channels model =
+viewWithRemoveButton : Context -> Model -> Html
+viewWithRemoveButton context model =
   div []
-    [ button [ onClick (send channels.actions Decrement) ] [ text "-" ]
+    [ button [ onClick (send context.actionChan Decrement) ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (send channels.actions Increment) ] [ text "+" ]
+    , button [ onClick (send context.actionChan Increment) ] [ text "+" ]
     , div [ countStyle ] []
-    , button [ onClick (send channels.delete ()) ] [ text "X" ]
+    , button [ onClick (send context.deleteChan ()) ] [ text "X" ]
     ]
 
 
