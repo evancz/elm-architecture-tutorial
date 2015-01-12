@@ -485,7 +485,7 @@ type Action
 
 The `update` function is pretty similar to example 4 as well.
 
-```
+```elm
 update : Action -> Model -> Model
 update action model =
   case action of
