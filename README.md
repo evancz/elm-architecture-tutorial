@@ -429,7 +429,9 @@ and then open
 In this case our goals mean that we need a new way to view a `Counter` that
 adds a remove button. Interestingly, we can keep the `view` function from
 before and add a new `viewWithRemoveButton` function that provides a slightly
-different view of our underlying `Model`:
+different view of our underlying `Model`. This is pretty cool. We do not need
+to duplicate any code or do any crazy subtyping or overloading. We just add
+a new function to the public API to expose new functionality!
 
 ```elm
 module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context) where
@@ -438,7 +440,7 @@ module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context
 
 type alias Context =
     { actionChan : LocalChannel Action
-    , deleteChan : LocalChannel ()
+    , removeChan : LocalChannel ()
     }
 
 viewWithRemoveButton : Context -> Model -> Html
@@ -448,22 +450,19 @@ viewWithRemoveButton context model =
     , div [ countStyle ] [ text (toString model) ]
     , button [ onClick (send context.actionChan Increment) ] [ text "+" ]
     , div [ countStyle ] []
-    , button [ onClick (send context.deleteChan ()) ] [ text "X" ]
+    , button [ onClick (send context.removeChan ()) ] [ text "X" ]
     ]
 ```
 
-The `viewWithRemoveButton` function just adds one extra button. The
-interesting thing here is that we have multiple channels we need to send
-messages to now. Instead of just updating this counter, we also pass in a way
-to say &ldquo;delete me!&rdquo; How that happens is the responsibility of
-whoever owns the counter.
+The `viewWithRemoveButton` function adds one extra button. Notice that the
+increment/decrement buttons send messages to the `actionChan` but the delete
+button sends messages to the `removeChan`. The messages we send along the
+`removeChan` are essentially saying, &ldquo;hey, whoever owns me, remove
+me!&rdquo; It is up to whoever owns this particular counter to do the removing.
 
-This is pretty cool. We do not need to duplicate any code or do any crazy
-subtyping or overloading. We just add another `view` function to the public
-API to expose new functionality!
-
-So now we get to the `CounterList` module, that actually puts all the
-individual counters together. The `Model` is the same as in example 3.
+Now that we have our new `viewWithRemoveButton`, we can create a `CounterList`
+module which puts all the individual counters together. The `Model` is the same
+as in example 3: a list of counters and a unique ID.
 
 ```elm
 type alias Model =
@@ -510,9 +509,9 @@ update action model =
           { model | counters <- List.map updateCounter model.counters }
 ```
 
-In the case of `Remove`, we got through the list of counters and keep
-everything that has a non-matching ID. Otherwise, the cases are quite close to
-how they were before.
+In the case of `Remove`, we take out the counter that has the ID we are
+supposed to remove. Otherwise, the cases are quite close to how they were
+before.
 
 Finally, we put it all together in the `view`:
 

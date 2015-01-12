@@ -39,7 +39,7 @@ view channel model =
 
 type alias Context =
     { actionChan : LocalChannel Action
-    , deleteChan : LocalChannel ()
+    , removeChan : LocalChannel ()
     }
 
 
@@ -50,7 +50,7 @@ viewWithRemoveButton context model =
     , div [ countStyle ] [ text (toString model) ]
     , button [ onClick (send context.actionChan Increment) ] [ text "+" ]
     , div [ countStyle ] []
-    , button [ onClick (send context.deleteChan ()) ] [ text "X" ]
+    , button [ onClick (send context.removeChan ()) ] [ text "X" ]
     ]
 
 
