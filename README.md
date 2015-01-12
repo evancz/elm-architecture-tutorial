@@ -277,7 +277,7 @@ Notice that we are able to reuse the `Counter.view` function for both of our
 counters. For each counter we create a [local-channel][]. Essentially what we
 are doing here is saying, &ldquo;let these counters send messages to the
 general `actionChannel` but make sure all of their messages are annotated with
-`Top` or `Bottom` so we can tell the difference.
+`Top` or `Bottom` so we can tell the difference.&rdquo;
 
 [local-channel]: http://package.elm-lang.org/packages/evancz/local-channel/latest
 
