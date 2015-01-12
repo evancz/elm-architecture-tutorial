@@ -568,3 +568,29 @@ you just call the function with the arguments you would like to test.
 
 [pure]: http://en.wikipedia.org/wiki/Pure_function
 
+## One Last Pattern
+
+There is one last important way to extend the basic pattern. For example, maybe
+you have a component that gets updated, and depending on the result, you need
+to change something else in your program. You can extend your `update` function
+to return extra information.
+
+```elm
+type Request = RefreshPage | Print
+
+update : Action -> Model -> (Model, Maybe Request)
+```
+
+Depending on the logic of the `update` we may be telling someone above us to
+refresh the content or print stuff out. The same sort of pattern can be used
+if a component can delete itself:
+
+```elm
+update : Action -> Model -> Maybe Model
+```
+
+If this is not clear, maybe I will write example 5 that shows this pattern in
+action. In the meantime, you can see examples like this in [the fancy version
+of the TodoMVC app written in Elm][fancy].
+
+[fancy]: https://github.com/evancz/elm-todomvc/blob/trim/Todo.elm
