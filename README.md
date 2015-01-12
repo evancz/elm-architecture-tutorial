@@ -7,7 +7,8 @@ with the basic pattern in a small example and slowly build on those core
 principles.
 
 To follow along with this tutorial, clone this repo and navigate to the root
-directory.
+directory. It can be helpful to look at the examples without all the words, so
+do not be afraid to open the code in your editor and poke around!
 
 ## The Basic Pattern
 
