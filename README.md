@@ -46,7 +46,7 @@ This tutorial is all about this pattern and small variations and extensions.
 
 Our first example is a simple counter that can be incremented or decremented.
 To see it in action, navigate into directory `1/`, run `elm-reactor`, and then
-open [http://localhost:8000/Counter.elm](http://localhost:8000/Counter.elm).
+open [http://localhost:8000/Counter.elm?debug](http://localhost:8000/Counter.elm?debug).
 
 This code starts with a very simple model. We just need to keep track of a
 single number:
@@ -165,7 +165,7 @@ and again.
 
 In this example we have two counters, each changing independently. To see it
 in action, navigate into directory `2/`, run `elm-reactor`, and then
-open [http://localhost:8000/CounterPair.elm](http://localhost:8000/CounterPair.elm).
+open [http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
 
 We wrote a simple counter in example 1, so our goal is to reuse all of that
 code. We can create a self-contained `Counter` module that encapsulates all the
@@ -289,9 +289,147 @@ values and functions, and create a `CounterPairPair` or whatever it is we need.
 ## Example 3: A Dynamic List of Counters
 
 A pair of counters is cool, but what about a list of counters where we can add
-and remove counters as we see fit?!
+and remove counters as we see fit? Can this pattern work for that too?
+
+To see this example in action, navigate into directory `3/`, run `elm-reactor`,
+and then open
+[http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
+
+In this example we can reuse the `Counter` module exactly as it was in example
+2.
+
+```elm
+module Counter (Model, init, Action, update, view)
+```
+
+That means we can just get started on our `CounterList` module. As always, we
+begin with our `Model`:
+
+```elm
+type alias Model =
+    { counters : List ( ID, Counter.Model )
+    , nextID : ID
+    }
+
+type alias ID = Int
+```
+
+Now our model has a list of counters, each annotated with a unique ID. These
+IDs allow us to distinguish between them, so if we need to update counter
+number 4 we have a nice way to refer to it. (This ID also gives us something
+conveient to [`key`][key] on when we are thinking about optimizing rendering,
+but that is not the focus of this tutorial!) Our model also contains a
+`nextID` which helps us assign unique IDs to each counter as we add new ones.
+
+[key]: http://package.elm-lang.org/packages/evancz/elm-html/latest/Html-Attributes#key
+
+Now we can define the set of `Actions` that can be performed on our model. We
+want to be able to add counters, remove counters, and update certain counters.
+
+```elm
+type Action
+    = Insert
+    | Remove
+    | Modify ID Counter.Action
+```
+
+Our `Action` [union type][] is shockingly close to the high-level description.
+Now we can define our `update` function.
+
+```elm
+update : Action -> Model -> Model
+update action model =
+  case action of
+    Insert ->
+      let newCounter = ( model.nextID, Counter.init 0 )
+          newCounters = model.counters ++ [ newCounter ]
+      in
+          { model |
+              counters <- newCounters,
+              nextID <- model.nextID + 1
+          }
+
+    Remove ->
+      { model | counters <- List.drop 1 model.counters }
+
+    Modify id counterAction ->
+      let updateCounter (counterID, counterModel) =
+            if counterID == id
+                then (counterID, Counter.update counterAction counterModel)
+                else (counterID, counterModel)
+      in
+          { model | counters <- List.map updateCounter model.counters }
+```
+
+Here is a high-level description of each case:
+
+  * `Insert` &mdash; First we create a new counter and put it at the end of
+    our counter list. Then we increment our `nextID` so that we have a fresh
+    ID next time around.
+
+  * `Remove` &mdash; Drop the first member of our counter list.
+
+  * `Modify` &mdash; Run through all of our counters. If we find one with
+    a matching ID, we perform the given `Action` on that counter.
+
+All that is left to do now is to define the `view`.
+
+```elm
+view : Model -> Html
+view model =
+  let counters = List.map viewCounter model.counters
+      remove = button [ onClick (Signal.send actionChannel Remove) ] [ text "Remove" ]
+      insert = button [ onClick (Signal.send actionChannel Insert) ] [ text "Add" ]
+  in
+      div [] ([remove, insert] ++ counters)
+
+viewCounter : (ID, Counter.Model) -> Html
+viewCounter (id, model) =
+  Counter.view (LC.create (Modify id) actionChannel) model
+```
+
+The fun part here is the `viewCounter` function. It uses the same old
+`Counter.view` function, but in this case we provide a [local-channel][] that
+annotates all messages with the ID of the particular counter that is getting
+rendered.
+
+When we create the actual `view` function, we map `viewCounter` over all of
+our counters and create add and remove buttons that report to the
+`actionChannel` directly.
+
+This ID trick can be used any time you want a dynamic number of subcomponents.
+Counters are very simple, but the pattern would work exactly the same if you
+had a list of user profiles or tweets or newsfeed items or product details.
 
 ## Example 4: A Fancier List of Counters
+
+Okay, keeping things simple and modular on a dynamic list of counters is pretty
+cool, but instead of a general remove button, what if each counter had its own
+specific remove button? Surely *that* will mess things up!
+
+Nah, it works.
+
+To see this example in action, navigate into directory `4/`, run `elm-reactor`,
+and then open
+[http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
+
+In this case our goals mean that we need a new way to view a `Counter` that
+adds a remove button. Interestingly, we can keep the `view` function from
+before and add a new `viewWithRemoveButton` function that provides a slightly
+different view of our underlying `Model`:
+
+```elm
+module Counter (Model, init, Action, update, view, viewWithRemoveButton) where
+
+...
+
+viewWithRemoveButton
+```
+
+This is pretty cool. We do not need to duplicate any code or do any crazy
+subtyping or overloading. We just add another `view` function to the public
+API to expose new functionality!
+
 
 ## Additional Comments
 
