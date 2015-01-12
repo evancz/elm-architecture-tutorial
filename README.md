@@ -106,6 +106,11 @@ make clever optimizations][elm-html]. Furthermore, `view` is a plain old
 function so we can get the full power of Elm&rsquo;s module system, test
 frameworks, and libraries when creating views.
 
+<span style="color:grey">
+(The tricky thing about our `view` function is the `Signal.send actionChannel`
+part. We will dive into that in the next section.)
+</span>
+
 This pattern is the essense of architecting Elm programs. Every example we see
 from now on will be a slight variation on this basic pattern: `Model`, `update`,
 `view`.
