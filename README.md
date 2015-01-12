@@ -166,19 +166,21 @@ are not *performing* those actions, we are simply reporting them back to
 our main Elm program. This separation is a key detail!
 
 I want to reemphasize that this `Signal` code is pretty much the same in all
-Elm programs. You can be very productive without diving much deeper than this,
-and it is not vital to modularity or the specific architecture this tutorial
-is focused on. To dive deeper into signals, take a look at
-[this tutorial][signals].
+Elm programs. It is good to [learn more about them][signals], but you should
+be able to continue with this tutorial with just the high-level picture. The
+point here is to focus on architecting your code, not to get bogged down in
+how you get everything running, so lets start extending our basic counter
+example!
 
 ## Example 2: A Pair of Counters
 
-In this example we have two counters, each changing independently. To see it
-in action, navigate into directory `2/`, run `elm-reactor`, and then
-open [http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
+In example 1 we created a basic counter, but how does that pattern scale when
+we want *two* counters? Can we keep things modular? To see example 2 in action,
+navigate into directory `2/`, run `elm-reactor`, and then open
+[http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
 
-We wrote a simple counter in example 1, so our goal is to reuse all of that
-code. We can create a self-contained `Counter` module that encapsulates all the
+Our primary goal here is to reuse *all* of the code from example 1. To do this,
+we create a self-contained `Counter` module that encapsulates all the
 implementation details. The only change necessary is in the `view` function, so
 I have elided all the other definitions which are unchanged:
 
