@@ -116,14 +116,14 @@ from now on will be a slight variation on this basic pattern: `Model`, `update`,
 ## Aside: Driving your App with Signals
 
 Now to understand the `Signal.send actionChannel` snippet.
+
 So far we have only been talking about pure functions and immutable data. This
 is great, but we also need to react to events in the world. This is the role of
 [signals][] in Elm. A signal is a value that changes over time, and it lets us
 talk about how our `Model` is going to evolve.
 
 Pretty much all Elm programs will have a small bit of code that drives the
-whole application. The details are not super important for our purpose, but
-the code will be some minor variation of what is seen in Example 1:
+whole application. In example 1 the snippet looks like this:
 
 ```elm
 main : Signal Html
@@ -139,8 +139,15 @@ actionChannel =
   Signal.channel Increment
 ```
 
-Rather than trying to figure out exactly what is going on line by line, I
-think it is enough to visualize what is happening at a high level.
+I will just briefly draw your attention to a couple details:
+
+  1. We start with an initial `Model` of 0.
+  2. We use the `update` function to step our `Model` forward.
+  3. We &ldquo;subscribe&rdquo; to the `actionsChannel` to get all the incoming `Actions`.
+  4. We put it all on screen with `view`.
+
+Rather than trying to figure out *exactly* what is going on line by line, I
+think it is best to start with visualizing what is happening at a high level.
 
 [signals]: http://elm-lang.org/learn/Using-Signals.elm
 
@@ -161,9 +168,8 @@ our main Elm program. This separation is a key detail!
 I want to reemphasize that this `Signal` code is pretty much the same in all
 Elm programs. You can be very productive without diving much deeper than this,
 and it is not vital to modularity or the specific architecture this tutorial
-is focused on. All of our subsequent examples will focus on the `Model`,
-`update`, and `view` so that we do not repeat this signal information again
-and again.
+is focused on. To dive deeper into signals, take a look at
+[this tutorial][signals].
 
 ## Example 2: A Pair of Counters
 
