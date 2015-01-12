@@ -1,4 +1,4 @@
-# A Modular Architecture for Elm programs
+# The Elm Architecture
 
 This tutorial outlines the general architecture you will see in all Elm
 programs. It is a simple pattern that is great for modularity, code reuse,
