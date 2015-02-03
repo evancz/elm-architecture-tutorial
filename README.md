@@ -210,7 +210,7 @@ view channel model =
 Rather than refering directly to a top-level `actionChannel` as we did in
 example 1, we give the channel as an argument so that each counter can be
 sending messages along different channels. This will let us augment a basic
-`Counter.Action` with extra information so that we know which counter is needs
+`Counter.Action` with extra information so that we know which counter needs
 to be updated. 
 
 Creating modular code is all about creating strong abstractions. We want
