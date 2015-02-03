@@ -330,7 +330,7 @@ type alias ID = Int
 Now our model has a list of counters, each annotated with a unique ID. These
 IDs allow us to distinguish between them, so if we need to update counter
 number 4 we have a nice way to refer to it. (This ID also gives us something
-conveient to [`key`][key] on when we are thinking about optimizing rendering,
+convenient to [`key`][key] on when we are thinking about optimizing rendering,
 but that is not the focus of this tutorial!) Our model also contains a
 `nextID` which helps us assign unique IDs to each counter as we add new ones.
 
