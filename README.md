@@ -1,14 +1,24 @@
 # The Elm Architecture
 
 This tutorial outlines the general architecture you will see in all Elm
-programs. It is a simple pattern that is great for modularity, code reuse,
-and testing. I find it somewhat shocking in its simplicity. We will start
-with the basic pattern in a small example and slowly build on those core
-principles.
+programs, from [TodoMVC](https://github.com/evancz/elm-todomvc)
+to [dreamwriter](https://github.com/rtfeldman/dreamwriter#dreamwriter).
 
-To follow along with this tutorial, clone this repo and navigate to the root
-directory. It can be helpful to look at the examples without all the words, so
-do not be afraid to open the code in your editor and poke around!
+We will learn a very simple architecture pattern that serves as an infinitely
+nestable building block. It is great for modularity, code reuse, and testing.
+Ultimately, this pattern makes it easy to create complex webapps in a way that
+stays modular. We will start with the basic pattern in a small example and slowly
+build on those core principles.
+
+One very interesting aspect of this architecture is that it *emerges* from
+Elm naturally. The language design itself leads you towards this architecture
+whether you have read this document and know the benefits or not. I actually
+discovered this pattern just using Elm and have been shocked by its simplicity
+and power.
+
+**Note**: To follow along with this tutorial with code,
+[install Elm](http://elm-lang.org/Install.elm) and fork this repo. Each
+example in the tutorial gives instructions of how to run the code.
 
 ## The Basic Pattern
 
