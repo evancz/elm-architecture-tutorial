@@ -1,6 +1,7 @@
 # The Elm Architecture
 
-This tutorial outlines the general architecture you will see in all Elm
+This tutorial outlines the general architecture you will see in all
+[Elm](http://elm-lang.org/)
 programs, from [TodoMVC](https://github.com/evancz/elm-todomvc)
 to [dreamwriter](https://github.com/rtfeldman/dreamwriter#dreamwriter).
 
