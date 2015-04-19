@@ -1,9 +1,8 @@
 module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context) where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import LocalChannel (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 -- MODEL
@@ -13,6 +12,7 @@ type alias Model = Int
 
 init : Int -> Model
 init count = count
+
 
 -- UPDATE
 
@@ -28,29 +28,29 @@ update action model =
 
 -- VIEW
 
-view : LocalChannel Action -> Model -> Html
-view channel model =
+view : Signal.Address Action -> Model -> Html
+view address model =
   div []
-    [ button [ onClick (send channel Decrement) ] [ text "-" ]
+    [ button [ onClick address Decrement ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (send channel Increment) ] [ text "+" ]
+    , button [ onClick address Increment ] [ text "+" ]
     ]
 
 
 type alias Context =
-    { actionChan : LocalChannel Action
-    , removeChan : LocalChannel ()
+    { actions : Signal.Address Action
+    , remove : Signal.Address ()
     }
 
 
 viewWithRemoveButton : Context -> Model -> Html
 viewWithRemoveButton context model =
   div []
-    [ button [ onClick (send context.actionChan Decrement) ] [ text "-" ]
+    [ button [ onClick context.actions Decrement ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (send context.actionChan Increment) ] [ text "+" ]
+    , button [ onClick context.actions Increment ] [ text "+" ]
     , div [ countStyle ] []
-    , button [ onClick (send context.removeChan ()) ] [ text "X" ]
+    , button [ onClick context.remove () ] [ text "X" ]
     ]
 
 

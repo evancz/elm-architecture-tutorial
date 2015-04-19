@@ -1,11 +1,9 @@
 module CounterPair where
 
 import Counter
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import LocalChannel as LC
-import Signal
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 -- MODEL
@@ -49,12 +47,12 @@ update action model =
 
 -- VIEW
 
-view : Model -> Html
-view model =
+view : Signal.Address Action -> Model -> Html
+view address model =
   div []
-    [ Counter.view (LC.create Top actionChannel) model.topCounter
-    , Counter.view (LC.create Bottom actionChannel) model.bottomCounter
-    , button [ onClick (Signal.send actionChannel Reset) ] [ text "RESET" ]
+    [ Counter.view (Signal.forwardTo address Top) model.topCounter
+    , Counter.view (Signal.forwardTo address Bottom) model.bottomCounter
+    , button [ onClick address Reset ] [ text "RESET" ]
     ]
 
 
@@ -62,14 +60,14 @@ view model =
 
 main : Signal Html
 main =
-  Signal.map view model
+  Signal.map (view actions.address) model
 
 
 model : Signal Model
 model =
-  Signal.foldp update (init 0 0) (Signal.subscribe actionChannel)
+  Signal.foldp update (init 0 0) actions.signal
 
 
-actionChannel : Signal.Channel Action
-actionChannel =
-  Signal.channel Reset
+actions : Signal.Mailbox Action
+actions =
+  Signal.mailbox Reset
