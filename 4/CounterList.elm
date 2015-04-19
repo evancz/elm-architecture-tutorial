@@ -1,12 +1,9 @@
 module CounterList where
 
 import Counter
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import List
-import LocalChannel as LC
-import Signal
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 -- MODEL
@@ -59,19 +56,19 @@ update action model =
 
 -- VIEW
 
-view : Model -> Html
-view model =
-  let insert = button [ onClick (Signal.send actionChannel Insert) ] [ text "Add" ]
+view : Signal.Address Action -> Model -> Html
+view address model =
+  let insert = button [ onClick address Insert ] [ text "Add" ]
   in
-      div [] (insert :: List.map viewCounter model.counters)
+      div [] (insert :: List.map (viewCounter address) model.counters)
 
 
-viewCounter : (ID, Counter.Model) -> Html
-viewCounter (id, model) =
+viewCounter : Signal.Address Action -> (ID, Counter.Model) -> Html
+viewCounter address (id, model) =
   let context =
         Counter.Context
-          (LC.create (Modify id) actionChannel)
-          (LC.create (always (Remove id)) actionChannel)
+          (Signal.forwardTo address (Modify id))
+          (Signal.forwardTo address (always (Remove id)))
   in
       Counter.viewWithRemoveButton context model
 
@@ -80,14 +77,14 @@ viewCounter (id, model) =
 
 main : Signal Html
 main =
-  Signal.map view model
+  Signal.map (view actions.address) model
 
 
 model : Signal Model
 model =
-  Signal.foldp update init (Signal.subscribe actionChannel)
+  Signal.foldp update init actions.signal
 
 
-actionChannel : Signal.Channel Action
-actionChannel =
-  Signal.channel Insert
+actions : Signal.Mailbox Action
+actions =
+  Signal.mailbox Insert

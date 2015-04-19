@@ -1,9 +1,8 @@
 module Counter (Model, init, Action, update, view) where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import LocalChannel (..)
+import Html exposing (..)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 
 
 -- MODEL
@@ -29,12 +28,12 @@ update action model =
 
 -- VIEW
 
-view : LocalChannel Action -> Model -> Html
-view channel model =
+view : Signal.Address Action -> Model -> Html
+view address model =
   div []
-    [ button [ onClick (send channel Decrement) ] [ text "-" ]
+    [ button [ onClick address Decrement ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (send channel Increment) ] [ text "+" ]
+    , button [ onClick address Increment ] [ text "+" ]
     ]
 
 

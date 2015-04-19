@@ -54,6 +54,7 @@ view =
 
 This tutorial is all about this pattern and small variations and extensions.
 
+
 ## Example 1: A Counter
 
 Our first example is a simple counter that can be incremented or decremented.
@@ -98,12 +99,12 @@ decrement button, a div showing the current count, and an increment button.
 [elm-html]: http://elm-lang.org/blog/Blazing-Fast-Html.elm
 
 ```elm
-view : Model -> Html
-view model =
+view : Signal.Address Action -> Model -> Html
+view address model =
   div []
-    [ button [ onClick (Signal.send actionChannel Decrement) ] [ text "-" ]
+    [ button [ onClick address Decrement) ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (Signal.send actionChannel Increment) ] [ text "+" ]
+    , button [ onClick address Increment) ] [ text "+" ]
     ]
 
 countStyle : Attribute
@@ -111,23 +112,23 @@ countStyle =
   ...
 ```
 
-The tricky thing about our `view` function is the `Signal.send actionChannel`
-part. We will dive into that in the next section! For now, I just want you to
-notice that **this code is entirely declarative**. We take in a `Model` and
-produce some `Html`. That is it. At no point do we mutate the DOM manually,
-which gives the library [much more freedom to make clever optimizations][elm-html]
+The tricky thing about our `view` function is the `Signal.Address` part. We
+will dive into that in the next section! For now, I just want you to notice
+that **this code is entirely declarative**. We take in a `Model` and produce
+some `Html`. That is it. At no point do we mutate the DOM manually, which
+gives the library [much more freedom to make clever optimizations][elm-html]
 and actually makes rendering *faster* overall. It is crazy. Furthermore, `view`
 is a plain old function so we can get the full power of Elm&rsquo;s module
 system, test frameworks, and libraries when creating views.
-
 
 This pattern is the essense of architecting Elm programs. Every example we see
 from now on will be a slight variation on this basic pattern: `Model`, `update`,
 `view`.
 
+
 ## Aside: Driving your App with Signals
 
-Now to understand the `Signal.send actionChannel` snippet.
+Now to understand the `Signal.Address` snippet.
 
 So far we have only been talking about pure functions and immutable data. This
 is great, but we also need to react to events in the world. This is the role of
@@ -140,22 +141,22 @@ whole application. In example 1 the snippet looks like this:
 ```elm
 main : Signal Html
 main =
-  Signal.map view model
+  Signal.map (view actions.address) model
 
 model : Signal Model
 model =
-  Signal.foldp update 0 (Signal.subscribe actionChannel)
+  Signal.foldp update 0 actions.address
 
-actionChannel : Signal.Channel Action
-actionChannel =
-  Signal.channel Increment
+actions : Signal.Mailbox Action
+actions =
+  Signal.mailbox Increment
 ```
 
 I will just briefly draw your attention to a couple details:
 
   1. We start with an initial `Model` of 0.
   2. We use the `update` function to step our `Model` forward.
-  3. We &ldquo;subscribe&rdquo; to the `actionsChannel` to get all the incoming `Actions`.
+  3. We react to a signal of `Actions` flowing through the `actions` mailbox.
   4. We put it all on screen with `view`.
 
 Rather than trying to figure out *exactly* what is going on line by line, I
@@ -169,13 +170,14 @@ The blue part is our core Elm program which is exactly the model/update/view
 pattern we have been discussing so far. When programming in Elm, you can
 mostly think inside this box and make great progress.
 
-The new thing here is how &ldquo;channels&rdquo; make it possible for new
-`Actions` to be triggered in response to user inputs. These channels are
+The new thing here is how &ldquo;mailboxes&rdquo; make it possible for new
+`Actions` to be triggered in response to user inputs. These mailboxes are
 roughly represented by the dotted arrows going from the monitor back to our
-Elm program. So when we specify certain channels in our `view`, we are
-describing how user `Actions` should come back into our program. Notice we
-are not *performing* those actions, we are simply reporting them back to
-our main Elm program. This separation is a key detail!
+Elm program. So when we specify certain addresses in our `view`, we are
+describing how user `Actions` should be directed to mailboxes and directed
+back into our program. Notice we are not *performing* those actions, we are
+simply reporting them back to our main Elm program. This separation is a key
+detail!
 
 I want to reemphasize that this `Signal` code is pretty much the same in all
 Elm programs. It is good to [learn more about them][signals], but you should
@@ -184,6 +186,7 @@ point here is to focus on architecting your code, not to get bogged down in
 how you get everything running, so lets start extending our basic counter
 example!
 
+
 ## Example 2: A Pair of Counters
 
 In example 1 we created a basic counter, but how does that pattern scale when
@@ -191,10 +194,10 @@ we want *two* counters? Can we keep things modular? To see example 2 in action,
 navigate into directory `2/`, run `elm-reactor`, and then open
 [http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
 
-Our primary goal here is to reuse *all* of the code from example 1. To do this,
-we create a self-contained `Counter` module that encapsulates all the
-implementation details. The only change necessary is in the `view` function, so
-I have elided all the other definitions which are unchanged:
+Wouldn't it be great if we could reuse all the code from example 1? The crazy
+thing about the Elm Architecture is that **we can reuse code with absolutely
+no changes**. We just create a self-contained `Counter` module that
+encapsulates all the implementation details:
 
 ```elm
 module Counter (Model, init, Action, update, view) where
@@ -209,20 +212,9 @@ type Action = ...
 update : Action -> Model -> Model
 update = ...
 
-view : LocalChannel Action -> Model -> Html
-view channel model =
-  div []
-    [ button [ onClick (send channel Decrement) ] [ text "-" ]
-    , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (send channel Increment) ] [ text "+" ]
-    ]
+view : Signal.Address Action -> Model -> Html
+view = ...
 ```
-
-Rather than refering directly to a top-level `actionChannel` as we did in
-example 1, we give the channel as an argument so that each counter can be
-sending messages along different channels. This will let us augment a basic
-`Counter.Action` with extra information so that we know which counter needs
-to be updated. 
 
 Creating modular code is all about creating strong abstractions. We want
 boundaries which appropriately expose functionality and hide implementation.
@@ -288,27 +280,24 @@ So now the final thing to do is create a `view` function that shows both of
 our counters on screen along with a reset button.
 
 ```elm
-view : Model -> Html
-view model =
+view : Signal.Address Action -> Model -> Html
+view address model =
   div []
-    [ Counter.view (LC.create Top actionChannel) model.topCounter
-    , Counter.view (LC.create Bottom actionChannel) model.bottomCounter
-    , button [ onClick (Signal.send actionChannel Reset) ] [ text "RESET" ]
+    [ Counter.view (Signal.forwardTo address Top) model.topCounter
+    , Counter.view (Signal.forwardTo address Bottom) model.bottomCounter
+    , button [ onClick address Reset ] [ text "RESET" ]
     ]
 ```
 
 Notice that we are able to reuse the `Counter.view` function for both of our
-counters. For each counter we create a [local-channel][]. Essentially what we
-are doing here is saying, &ldquo;let these counters send messages to the
-general `actionChannel` but make sure all of their messages are annotated with
-`Top` or `Bottom` so we can tell the difference.&rdquo;
+counters. For each counter we create a forwarding address. Essentially what we
+are doing here is saying, &ldquo;these counters will tag all outgoing messages
+with `Top` or `Bottom` so we can tell the difference.&rdquo;
 
-[local-channel]: http://package.elm-lang.org/packages/evancz/local-channel/latest
+That is the whole thing. The cool thing is that we can keep nesting more and
+more. We can take the `CounterPair` module, expose the key values and
+functions, and create a `CounterPairPair` or whatever it is we need.
 
-That is the whole thing. With the help of [local-channel][], we were able to
-nest our pattern model/update/view pattern. The cool thing is that we can keep
-nesting more and more. We can take the `CounterPair` module, expose the key
-values and functions, and create a `CounterPairPair` or whatever it is we need.
 
 ## Example 3: A Dynamic List of Counters
 
@@ -399,31 +388,32 @@ Here is a high-level description of each case:
 All that is left to do now is to define the `view`.
 
 ```elm
-view : Model -> Html
-view model =
-  let counters = List.map viewCounter model.counters
-      remove = button [ onClick (Signal.send actionChannel Remove) ] [ text "Remove" ]
-      insert = button [ onClick (Signal.send actionChannel Insert) ] [ text "Add" ]
+view : Signal.Address Action -> Model -> Html
+view address model =
+  let counters = List.map (viewCounter address) model.counters
+      remove = button [ onClick address Remove ] [ text "Remove" ]
+      insert = button [ onClick address Insert ] [ text "Add" ]
   in
       div [] ([remove, insert] ++ counters)
 
-viewCounter : (ID, Counter.Model) -> Html
-viewCounter (id, model) =
-  Counter.view (LC.create (Modify id) actionChannel) model
+viewCounter : Signal.Address Action -> (ID, Counter.Model) -> Html
+viewCounter address (id, model) =
+  Counter.view (Signal.forwardTo address (Modify id)) model
 ```
 
 The fun part here is the `viewCounter` function. It uses the same old
-`Counter.view` function, but in this case we provide a [local-channel][] that
+`Counter.view` function, but in this case we provide a forwarding address that
 annotates all messages with the ID of the particular counter that is getting
 rendered.
 
 When we create the actual `view` function, we map `viewCounter` over all of
-our counters and create add and remove buttons that report to the
-`actionChannel` directly.
+our counters and create add and remove buttons that report to the `address`
+directly.
 
 This ID trick can be used any time you want a dynamic number of subcomponents.
 Counters are very simple, but the pattern would work exactly the same if you
 had a list of user profiles or tweets or newsfeed items or product details.
+
 
 ## Example 4: A Fancier List of Counters
 
@@ -450,25 +440,25 @@ module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context
 ...
 
 type alias Context =
-    { actionChan : LocalChannel Action
-    , removeChan : LocalChannel ()
+    { actions : Signal.Address Action
+    , remove : Signal.Address ()
     }
 
 viewWithRemoveButton : Context -> Model -> Html
 viewWithRemoveButton context model =
   div []
-    [ button [ onClick (send context.actionChan Decrement) ] [ text "-" ]
+    [ button [ onClick context.actions Decrement ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (send context.actionChan Increment) ] [ text "+" ]
+    , button [ onClick context.actions Increment ] [ text "+" ]
     , div [ countStyle ] []
-    , button [ onClick (send context.removeChan ()) ] [ text "X" ]
+    , button [ onClick context.remove () ] [ text "X" ]
     ]
 ```
 
 The `viewWithRemoveButton` function adds one extra button. Notice that the
-increment/decrement buttons send messages to the `actionChan` but the delete
-button sends messages to the `removeChan`. The messages we send along the
-`removeChan` are essentially saying, &ldquo;hey, whoever owns me, remove
+increment/decrement buttons send messages to the `actions` address but the
+delete button sends messages to the `remove` address. The messages we send
+along to `remove` are essentially saying, &ldquo;hey, whoever owns me, remove
 me!&rdquo; It is up to whoever owns this particular counter to do the removing.
 
 Now that we have our new `viewWithRemoveButton`, we can create a `CounterList`
@@ -527,25 +517,26 @@ before.
 Finally, we put it all together in the `view`:
 
 ```elm
-view : Model -> Html
-view model =
-  let insert = button [ onClick (Signal.send actionChannel Insert) ] [ text "Add" ]
+view : Signal.Address Action -> Model -> Html
+view address model =
+  let insert = button [ onClick address Insert ] [ text "Add" ]
   in
-      div [] (insert :: List.map viewCounter model.counters)
+      div [] (insert :: List.map (viewCounter address) model.counters)
 
-viewCounter : (ID, Counter.Model) -> Html
-viewCounter (id, model) =
+viewCounter : Signal.Address Action -> (ID, Counter.Model) -> Html
+viewCounter address (id, model) =
   let context =
         Counter.Context
-          (LC.create (Modify id) actionChannel)
-          (LC.create (always (Remove id)) actionChannel)
+          (Signal.forwardTo address (Modify id))
+          (Signal.forwardTo address (always (Remove id)))
   in
       Counter.viewWithRemoveButton context model
 ```
 
 In our `viewCounter` function, we construct the `Counter.Context` to pass in
-all the nesessary local channels. In both cases we annotate each
+all the nesessary forwarding addresses. In both cases we annotate each
 `Counter.Action` so that we know which counter to modify or remove.
+
 
 ## Big Lessons So Far
 
@@ -553,7 +544,7 @@ all the nesessary local channels. In both cases we annotate each
 `update` that model, and a way to `view` that model. Everything is a variation
 on this basic pattern.
 
-**Nesting Modules** &mdash; A [local-channel][] makes it easy to nest our
+**Nesting Modules** &mdash; Forwarding addresses makes it easy to nest our
 basic pattern, hiding implementation details entirely. We can nest this
 pattern arbitrarily deep, and each level only needs to know about what is
 going on one level lower.
@@ -577,6 +568,7 @@ function. There is no special initialization or mocking or configuration step,
 you just call the function with the arguments you would like to test.
 
 [pure]: http://en.wikipedia.org/wiki/Pure_function
+
 
 ## One Last Pattern
 

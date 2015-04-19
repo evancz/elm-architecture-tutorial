@@ -1,9 +1,8 @@
 module Counter where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Signal
+import Html exposing (..)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 
 
 -- MODEL
@@ -24,12 +23,12 @@ update action model =
 
 -- VIEW
 
-view : Model -> Html
-view model =
+view : Signal.Address Action -> Model -> Html
+view address model =
   div []
-    [ button [ onClick (Signal.send actionChannel Decrement) ] [ text "-" ]
+    [ button [ onClick address Decrement ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick (Signal.send actionChannel Increment) ] [ text "+" ]
+    , button [ onClick address Increment ] [ text "+" ]
     ]
 
 
@@ -48,12 +47,14 @@ countStyle =
 
 main : Signal Html
 main =
-  Signal.map view model
+  Signal.map (view actions.address) model
+
 
 model : Signal Model
 model =
-  Signal.foldp update 0 (Signal.subscribe actionChannel)
+  Signal.foldp update 0 actions.signal
 
-actionChannel : Signal.Channel Action
-actionChannel =
-  Signal.channel Increment
+
+actions : Signal.Mailbox Action
+actions =
+  Signal.mailbox Increment
