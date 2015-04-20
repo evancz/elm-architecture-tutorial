@@ -145,7 +145,7 @@ main =
 
 model : Signal Model
 model =
-  Signal.foldp update 0 actions.address
+  Signal.foldp update 0 actions.signal
 
 actions : Signal.Mailbox Action
 actions =
