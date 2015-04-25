@@ -484,7 +484,7 @@ type Action
     | Modify ID Counter.Action
 ```
 
-The `update` function is pretty similar to example 4 as well.
+The `update` function is pretty similar to example 3 as well.
 
 ```elm
 update : Action -> Model -> Model
