@@ -4,6 +4,15 @@ import Counter
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import StartApp
+
+
+main =
+  StartApp.start
+    { model = init
+    , update = update
+    , view = view
+    }
 
 
 -- MODEL
@@ -69,20 +78,3 @@ view address model =
 viewCounter : Signal.Address Action -> (ID, Counter.Model) -> Html
 viewCounter address (id, model) =
   Counter.view (Signal.forwardTo address (Modify id)) model
-
-
--- SIGNALS
-
-main : Signal Html
-main =
-  Signal.map (view actions.address) model
-
-
-model : Signal Model
-model =
-  Signal.foldp update init actions.signal
-
-
-actions : Signal.Mailbox Action
-actions =
-  Signal.mailbox Insert

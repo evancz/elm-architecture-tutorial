@@ -3,6 +3,15 @@ module Counter where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import StartApp
+
+
+main =
+  StartApp.start
+    { model = 0
+    , update = update
+    , view = view
+    }
 
 
 -- MODEL
@@ -41,20 +50,3 @@ countStyle =
     , ("width", "50px")
     , ("text-align", "center")
     ]
-
-
--- SIGNALS
-
-main : Signal Html
-main =
-  Signal.map (view actions.address) model
-
-
-model : Signal Model
-model =
-  Signal.foldp update 0 actions.signal
-
-
-actions : Signal.Mailbox Action
-actions =
-  Signal.mailbox Increment
