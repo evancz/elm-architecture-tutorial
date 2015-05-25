@@ -112,57 +112,41 @@ countStyle =
   ...
 ```
 
-The tricky thing about our `view` function is the `Signal.Address` part. We
-will dive into that in the next section! For now, I just want you to notice
-that **this code is entirely declarative**. We take in a `Model` and produce
-some `Html`. That is it. At no point do we mutate the DOM manually, which
-gives the library [much more freedom to make clever optimizations][elm-html]
-and actually makes rendering *faster* overall. It is crazy. Furthermore, `view`
-is a plain old function so we can get the full power of Elm&rsquo;s module
-system, test frameworks, and libraries when creating views.
+The tricky thing about our `view` function is the `Address`. We will dive into
+that in the next section! For now, I just want you to notice that **this code
+is entirely declarative**. We take in a `Model` and produce some `Html`. That
+is it. At no point do we mutate the DOM manually, which gives the library
+[much more freedom to make clever optimizations][elm-html] and actually makes
+rendering *faster* overall. It is crazy. Furthermore, `view` is a plain old
+function so we can get the full power of Elm&rsquo;s module system, test
+frameworks, and libraries when creating views.
 
 This pattern is the essense of architecting Elm programs. Every example we see
 from now on will be a slight variation on this basic pattern: `Model`, `update`,
 `view`.
 
 
-## Aside: Driving your App with Signals
-
-Now to understand the `Signal.Address` snippet.
-
-So far we have only been talking about pure functions and immutable data. This
-is great, but we also need to react to events in the world. This is the role of
-[signals][] in Elm. A signal is a value that changes over time, and it lets us
-talk about how our `Model` is going to evolve.
+## Understanding StartApp
 
 Pretty much all Elm programs will have a small bit of code that drives the
 whole application. In example 1 the snippet looks like this:
 
 ```elm
-main : Signal Html
 main =
-  Signal.map (view actions.address) model
-
-model : Signal Model
-model =
-  Signal.foldp update 0 actions.address
-
-actions : Signal.Mailbox Action
-actions =
-  Signal.mailbox Increment
+  StartApp.start { model = 0, update = update, view = view }
 ```
 
-I will just briefly draw your attention to a couple details:
+We are use the [`StartApp`](https://github.com/evancz/start-app) package to
+wire together our initial model with the update and view functions.
 
-  1. We start with an initial `Model` of 0.
-  2. We use the `update` function to step our `Model` forward.
-  3. We react to a signal of `Actions` flowing through the `actions` mailbox.
-  4. We put it all on screen with `view`.
+The key to this is the concept of an `Address`. Every event handler in our
+`view` function reports to a particular address. It just sends chunks of data
+along. The `StartApp` package monitors all the messages coming in to this
+address and feeds them into the `update` function. The model gets updated
+and [elm-html][] takes care of rendering the changes efficiently.
 
-Rather than trying to figure out *exactly* what is going on line by line, I
-think it is best to start with visualizing what is happening at a high level.
-
-[signals]: http://elm-lang.org/learn/Using-Signals.elm
+This means values flow through an Elm program in only one direction, something
+like this:
 
 ![Signal Graph Summary](diagrams/signal-graph-summary.png)
 
@@ -170,21 +154,9 @@ The blue part is our core Elm program which is exactly the model/update/view
 pattern we have been discussing so far. When programming in Elm, you can
 mostly think inside this box and make great progress.
 
-The new thing here is how &ldquo;mailboxes&rdquo; make it possible for new
-`Actions` to be triggered in response to user inputs. These mailboxes are
-roughly represented by the dotted arrows going from the monitor back to our
-Elm program. So when we specify certain addresses in our `view`, we are
-describing how user `Actions` should be directed to mailboxes and directed
-back into our program. Notice we are not *performing* those actions, we are
-simply reporting them back to our main Elm program. This separation is a key
-detail!
-
-I want to reemphasize that this `Signal` code is pretty much the same in all
-Elm programs. It is good to [learn more about them][signals], but you should
-be able to continue with this tutorial with just the high-level picture. The
-point here is to focus on architecting your code, not to get bogged down in
-how you get everything running, so lets start extending our basic counter
-example!
+Notice we are not *performing* actions as they get sent back to our app. We
+are simply sending some data over. This separation is a key detail, keeping
+our logic totally separate from our view code.
 
 
 ## Example 2: A Pair of Counters

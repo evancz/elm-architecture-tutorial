@@ -4,6 +4,15 @@ import Counter
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import StartApp
+
+
+main =
+  StartApp.start
+    { model = init 0 0
+    , update = update
+    , view = view
+    }
 
 
 -- MODEL
@@ -54,20 +63,3 @@ view address model =
     , Counter.view (Signal.forwardTo address Bottom) model.bottomCounter
     , button [ onClick address Reset ] [ text "RESET" ]
     ]
-
-
--- SIGNALS
-
-main : Signal Html
-main =
-  Signal.map (view actions.address) model
-
-
-model : Signal Model
-model =
-  Signal.foldp update (init 0 0) actions.signal
-
-
-actions : Signal.Mailbox Action
-actions =
-  Signal.mailbox Reset
