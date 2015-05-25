@@ -126,7 +126,7 @@ from now on will be a slight variation on this basic pattern: `Model`, `update`,
 `view`.
 
 
-## Understanding StartApp
+## Starting the Program
 
 Pretty much all Elm programs will have a small bit of code that drives the
 whole application. In example 1 the snippet looks like this:
@@ -137,13 +137,15 @@ main =
 ```
 
 We are use the [`StartApp`](https://github.com/evancz/start-app) package to
-wire together our initial model with the update and view functions.
+wire together our initial model with the update and view functions. It is a
+small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm)
+so that you do not need to dive into that concept yet.
 
-The key to this is the concept of an `Address`. Every event handler in our
-`view` function reports to a particular address. It just sends chunks of data
-along. The `StartApp` package monitors all the messages coming in to this
-address and feeds them into the `update` function. The model gets updated
-and [elm-html][] takes care of rendering the changes efficiently.
+The key to wiring up your application is the concept of an `Address`. Every
+event handler in our `view` function reports to a particular address. It just
+sends chunks of data along. The `StartApp` package monitors all the messages
+coming in to this address and feeds them into the `update` function. The model
+gets updated and [elm-html][] takes care of rendering the changes efficiently.
 
 This means values flow through an Elm program in only one direction, something
 like this:
