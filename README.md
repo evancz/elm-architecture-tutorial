@@ -102,9 +102,9 @@ decrement button, a div showing the current count, and an increment button.
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
-    [ button [ onClick address Decrement) ] [ text "-" ]
+    [ button [ onClick address Decrement ] [ text "-" ]
     , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick address Increment) ] [ text "+" ]
+    , button [ onClick address Increment ] [ text "+" ]
     ]
 
 countStyle : Attribute
