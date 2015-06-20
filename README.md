@@ -24,7 +24,13 @@ example in the tutorial gives instructions of how to run the code.
 ## The Basic Pattern
 
 The logic of every Elm program will break up into three cleanly separated
-parts: model, update, and view. You can pretty reliably start with the
+parts:
+
+  * model
+  * update
+  * view
+
+You can pretty reliably start with the
 following skeleton and then iteratively fill in details for your particular
 case.
 
@@ -136,10 +142,10 @@ main =
   StartApp.start { model = 0, update = update, view = view }
 ```
 
-We are use the [`StartApp`](https://github.com/evancz/start-app) package to
+We are using the [`StartApp`](https://github.com/evancz/start-app) package to
 wire together our initial model with the update and view functions. It is a
 small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm)
-so that you do not need to dive into that concept yet.
+so that you do not need to dive into the concept of signals yet.
 
 The key to wiring up your application is the concept of an `Address`. Every
 event handler in our `view` function reports to a particular address. It just
