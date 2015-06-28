@@ -64,7 +64,7 @@ This tutorial is all about this pattern and small variations and extensions.
 ## Example 1: A Counter
 
 Our first example is a simple counter that can be incremented or decremented.
-To see it in action, navigate into directory `1/`, run `elm-reactor`, and then
+To see it in action, navigate into directory `1`, run `elm-reactor`, and then
 open [http://localhost:8000/Counter.elm?debug](http://localhost:8000/Counter.elm?debug).
 
 This code starts with a very simple model. We just need to keep track of a
@@ -120,21 +120,23 @@ countStyle =
 
 The tricky thing about our `view` function is the `Address`. We will dive into
 that in the next section! For now, I just want you to notice that **this code
-is entirely declarative**. We take in a `Model` and produce some `Html`. That
-is it. At no point do we mutate the DOM manually, which gives the library
+is entirely declarative**. We take in a `Model` and produce some `Html`. That's
+it! At no point do we mutate the DOM manually, which gives the library
 [much more freedom to make clever optimizations][elm-html] and actually makes
-rendering *faster* overall. It is crazy. Furthermore, `view` is a plain old
+rendering *faster* overall. 
+
+Furthermore, `view` is a plain old
 function so we can get the full power of Elm&rsquo;s module system, test
 frameworks, and libraries when creating views.
 
-This pattern is the essense of architecting Elm programs. Every example we see
+This pattern is the essence of architecting Elm programs. Every example we see
 from now on will be a slight variation on this basic pattern: `Model`, `update`,
 `view`.
 
 
 ## Starting the Program
 
-Pretty much all Elm programs will have a small bit of code that drives the
+Nearly all Elm programs will have a small bit of code that drives the
 whole application. In example 1 the snippet looks like this:
 
 ```elm
@@ -149,8 +151,8 @@ so that you do not need to dive into the concept of signals yet.
 
 The key to wiring up your application is the concept of an `Address`. Every
 event handler in our `view` function reports to a particular address. It just
-sends chunks of data along. The `StartApp` package monitors all the messages
-coming in to this address and feeds them into the `update` function. The model
+sends chunks of data along. The `StartApp` package monitors all messages
+arriving at this address and then feeds them into the `update` function. The model
 gets updated and [elm-html][] takes care of rendering the changes efficiently.
 
 This means values flow through an Elm program in only one direction, something
@@ -171,11 +173,11 @@ our logic totally separate from our view code.
 
 In example 1 we created a basic counter, but how does that pattern scale when
 we want *two* counters? Can we keep things modular? To see example 2 in action,
-navigate into directory `2/`, run `elm-reactor`, and then open
+navigate into directory `2`, run `elm-reactor`, and then open
 [http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
 
-Wouldn't it be great if we could reuse all the code from example 1? The crazy
-thing about the Elm Architecture is that **we can reuse code with absolutely
+Wouldn't it be great if we could reuse all the code from example 1? One of the greatest
+features of the Elm Architecture is that **we can reuse code with absolutely
 no changes**. We just create a self-contained `Counter` module that
 encapsulates all the implementation details:
 
@@ -274,8 +276,8 @@ counters. For each counter we create a forwarding address. Essentially what we
 are doing here is saying, &ldquo;these counters will tag all outgoing messages
 with `Top` or `Bottom` so we can tell the difference.&rdquo;
 
-That is the whole thing. The cool thing is that we can keep nesting more and
-more. We can take the `CounterPair` module, expose the key values and
+That is all the changes required! A great benefit is that this pattern easily allows us
+to keep nesting more and more. We can take the `CounterPair` module, expose the key values and
 functions, and create a `CounterPairPair` or whatever it is we need.
 
 
@@ -284,12 +286,11 @@ functions, and create a `CounterPairPair` or whatever it is we need.
 A pair of counters is cool, but what about a list of counters where we can add
 and remove counters as we see fit? Can this pattern work for that too?
 
-To see this example in action, navigate into directory `3/`, run `elm-reactor`,
+To see this example in action, navigate into directory `3`, run `elm-reactor`,
 and then open
 [http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
 
-In this example we can reuse the `Counter` module exactly as it was in example
-2.
+In this example we can reuse the `Counter` module exactly as it was in example 2.
 
 ```elm
 module Counter (Model, init, Action, update, view)
@@ -399,11 +400,11 @@ had a list of user profiles or tweets or newsfeed items or product details.
 
 Okay, keeping things simple and modular on a dynamic list of counters is pretty
 cool, but instead of a general remove button, what if each counter had its own
-specific remove button? Surely *that* will mess things up!
+specific remove button? Surely *that* will mess things up?
 
-Nah, it works.
+No. It still works!
 
-To see this example in action, navigate into directory `4/`, run `elm-reactor`,
+To see this example in action, navigate into directory `4`, run `elm-reactor`,
 and then open
 [http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
 
@@ -464,7 +465,7 @@ type Action
     | Modify ID Counter.Action
 ```
 
-The `update` function is pretty similar to example 4 as well.
+The `update` function is similar to example 4 as well.
 
 ```elm
 update : Action -> Model -> Model
@@ -514,7 +515,7 @@ viewCounter address (id, model) =
 ```
 
 In our `viewCounter` function, we construct the `Counter.Context` to pass in
-all the nesessary forwarding addresses. In both cases we annotate each
+all the necessary forwarding addresses. In both cases we annotate each
 `Counter.Action` so that we know which counter to modify or remove.
 
 
@@ -525,7 +526,7 @@ all the nesessary forwarding addresses. In both cases we annotate each
 on this basic pattern.
 
 **Nesting Modules** &mdash; Forwarding addresses makes it easy to nest our
-basic pattern, hiding implementation details entirely. We can nest this
+basic pattern by hiding implementation details entirely. We can nest this
 pattern arbitrarily deep, and each level only needs to know about what is
 going on one level lower.
 
