@@ -59,7 +59,16 @@ This tutorial is all about this pattern and small variations and extensions.
 
 ## Example 1: A Counter
 
-Our first example is a simple counter that can be incremented or decremented. To see it in action, navigate into directory `1/`, run `elm-reactor`, and then open [http://localhost:8000/Counter.elm?debug](http://localhost:8000/Counter.elm?debug).
+Our first example is a simple counter that can be incremented or decremented. To see it in action, run these commands:
+
+```bash
+git clone https://github.com/evancz/elm-architecture-tutorial/
+cd elm-architecture-tutorial
+cd examples/1
+elm-reactor
+```
+
+Then open [http://localhost:8000/Counter.elm?debug](http://localhost:8000/Counter.elm?debug).
 
 This code starts with a very simple model. We just need to keep track of a single number:
 
@@ -130,8 +139,14 @@ Notice we are not *performing* actions as they get sent back to our app. We are 
 
 ## Example 2: A Pair of Counters
 
-In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular? To see example 2 in action, navigate into directory `2/`, run `elm-reactor`, and then open
-[http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
+In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular? To see example 2 in action, start in the root of this repo and run:
+
+```bash
+cd examples/2
+elm-reactor
+```
+
+Then open s[http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
 
 Wouldn't it be great if we could reuse all the code from example 1? The crazy thing about the Elm Architecture is that **we can reuse code with absolutely no changes**. We just create a self-contained `Counter` module that encapsulates all the implementation details:
 
@@ -220,11 +235,16 @@ That is the whole thing. The cool thing is that we can keep nesting more and mor
 
 A pair of counters is cool, but what about a list of counters where we can add and remove counters as we see fit? Can this pattern work for that too?
 
-To see this example in action, navigate into directory `3/`, run `elm-reactor`, and then open
-[http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
+To see this example in action, run the following commands from the root of this repo:
 
-In this example we can reuse the `Counter` module exactly as it was in example
-2.
+```bash
+cd examples/3
+elm-reactor
+```
+
+Then open [http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
+
+In this example we can reuse the `Counter` module exactly as it was in example 2.
 
 ```elm
 module Counter (Model, init, Action, update, view)
@@ -323,8 +343,14 @@ Okay, keeping things simple and modular on a dynamic list of counters is pretty 
 
 Nah, it works.
 
-To see this example in action, navigate into directory `4/`, run `elm-reactor`, and then open
-[http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
+To see this example in action, run the following commands from the root of this repo:
+
+```bash
+cd examples/4
+elm-reactor
+```
+
+Then open [http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
 
 In this case our goals mean that we need a new way to view a `Counter` that adds a remove button. Interestingly, we can keep the `view` function from before and add a new `viewWithRemoveButton` function that provides a slightly different view of our underlying `Model`. This is pretty cool. We do not need to duplicate any code or do any crazy subtyping or overloading. We just add a new function to the public API to expose new functionality!
 
