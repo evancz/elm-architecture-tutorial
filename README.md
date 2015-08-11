@@ -671,121 +671,103 @@ Interestingly, it is pretty much exactly the same! (Or perhaps it is no longer s
 
 This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation lives in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
 
-> **Note:** I expect we can build some abstractions on top of the core ideas here. This example does some lower level stuff, but I bet we can find some nice patterns to make this easier as we work with it more. If you find it weird now, try to make something better and tell us about it!
-
-
-All the new and interesting stuff is happening in `SpinSquare`, so we are going to focus on that code. The first thing we need there is a model:
+So all the new and interesting stuff is happening [in `SpinSquare`](examples/8/SpinSquare.elm), so we are going to focus on that code. The first thing we need is a model:
 
 ```elm
 type alias Model =
     { angle : Float
-    , animationState : Maybe { prevClockTime : Float, time : Float }
+    , animationState : AnimationState
     }
 
 
-init : Transaction Message Model
-init =
-  done { angle = 0, animationState = Nothing }
+type alias AnimationState =
+    Maybe { prevClockTime : Time,  elapsedTime: Time }
 
 
 rotateStep = 90
+duration = second
 ```
 
 So our core model is the `angle` that the square is currently at and then some `animationState` to track what is going on with any ongoing animation. If there is no animation it is `Nothing`, but if something is happening it holds:
   
   * `prevClockTime` &mdash; The most recent clock time which we will use for calculating time diffs. It will help us know exactly how many milliseconds have passed since last frame.
-  * `count` &mdash; A number between 0 and 1000 that tells us how far we are in the animation.
+  * `elapsedTime` &mdash; A number between 0 and `duration` that tells us how far we are in the animation.
 
 The `rotateStep` constant is just declaring how far it turns on each click. You can mess with that and everything should keep working.
 
 Now the interesting stuff all happens in `update`:
 
 ```elm
-update : Message -> Model -> Transaction Message Model
+type Action
+    = Spin
+    | Tick Time
+
+
+update : Action -> Model -> (Model, Effects Action)
 update msg model =
   case msg of
     Spin ->
       case model.animationState of
         Nothing ->
-          requestTick Tick model
+          ( model, Effects.tick Tick )
 
         Just _ ->
-          done model
+          ( model, Effects.none )
 
     Tick clockTime ->
       let
-        newCount =
+        newElapsedTime =
           case model.animationState of
             Nothing ->
               0
 
-            Just {count, prevClockTime} ->
-              count + (clockTime - prevClockTime)
+            Just {elapsedTime, prevClockTime} ->
+              elapsedTime + (clockTime - prevClockTime)
       in
-        if newCount > 1000 then
-          done
-            { angle = model.angle + rotateStep
+        if newElapsedTime > duration then
+          ( { angle = model.angle + rotateStep
             , animationState = Nothing
             }
+          , Effects.none
+          )
         else
-          requestTick Tick
-            { angle = model.angle
-            , animationState = Just { count = newCount, prevClockTime = clockTime }
+          ( { angle = model.angle
+            , animationState = Just { elapsedTime = newElapsedTime, prevClockTime = clockTime }
             }
+          , Effects.tick Tick
+          )
 ```
 
-There are two kinds of `Message` we need to handle:
+There are two kinds of `Action` we need to handle:
 
   - `Spin` indicates that a user clicked the shape, requesting a spin. So in the `update` function, we request a clock tick if there is no animation going and just let things stay as is if one is already going.
   - `Tick` indicates that we have gotten a clock tick so we need to take an animation step. In the `update` function this means we need to update our `animationState`. So first we check if there is an animation in progress. If so, we just figure out what the `newCount` is by taking the current `count` and adding a time diff to it. If the count is greater than 1000 we stop animating and stop requesting new clock ticks. Otherwise we update the animation state and request another clock tick.
 
 Again, I think we can cut this code down as we write more code like this and start seeing the general pattern. Should be exciting to find!
 
+Finally we have a somewhat interesting `view` function! This example gets a nice bouncy animation, but we are just incrementing our `elapsedTime` in linear chunks. How is that happening?
 
-### Viewing the Animation
-
-Finally we have a somewhat interesting `view` function! This example gets a nice bouncy animation, but we are just counting from 0 to 1000. How is that happening?
-
-We are using the [@Dandandan](https://github.com/Dandandan)’s [easing package](http://package.elm-lang.org/packages/Dandandan/Easing/latest) which makes it to do [all sorts of cool easings](http://easings.net/) on numbers, colors, points, and any other crazy thing you want. We are also using [`elm-svg`](http://package.elm-lang.org/packages/evancz/elm-svg/latest/) to work with fancier shapes.
+The `view` code itself is totally standard [`elm-svg`](http://package.elm-lang.org/packages/evancz/elm-svg/latest/) to make some fancier clickable shapes. The cool part of the view code is `toOffset` which calculates the rotation offset for the current `AnimationState`.
 
 ```elm
 -- import Easing exposing (ease, easeOutBounce, float)
 
-view : Signal.Address Message -> Model -> Html
-view address model =
-  let
-    angle =
-      case model.animationState of
-        Nothing ->
-          model.angle
+toOffset : AnimationState -> Float
+toOffset animationState =
+  case animationState of
+    Nothing ->
+      0
 
-        Just {count} ->
-          model.angle + ease easeOutBounce float 0 rotateStep 1000 count
-  in
-    svg
-      [ width "200", height "200", viewBox "0 0 200 200" ]
-      [ g [ transform ("translate(100, 100) rotate(" ++ toString angle ++ ")")
-          , onClick (Signal.message address Spin)
-          ]
-          [ rect
-              [ x "-50"
-              , y "-50"
-              , width "100"
-              , height "100"
-              , rx "15"
-              , ry "15"
-              , style "fill: #60B5CC;"
-              ]
-              []
-          , text' [ fill "white", textAnchor "middle" ] [ text "Click me!" ]
-          ]
-      ]
+    Just {elapsedTime} ->
+      ease easeOutBounce float 0 rotateStep duration elapsedTime
 ```
 
-The SVG stuff here is pretty typical, just showing some nodes in certain places. The interesting thing is how we calculate `angle` if there is an ongoing animation.
+We are using the [@Dandandan](https://github.com/Dandandan)’s [easing package](http://package.elm-lang.org/packages/Dandandan/Easing/latest) which makes it to do [all sorts of cool easings](http://easings.net/) on numbers, colors, points, and any other crazy thing you want.
 
-So the `ease` function is taking a number between 0 and 1000. It then turns that into a number between 0 and `rotateStep` which we set to 90 degrees up top. You also provide an easing. In our case we gave `easeOutBounce` which means as we slide from 0 to 1000, we will get a number between 0 and 90 with that easing added. Pretty crazy! Try swapping `easeOutBounce` out for [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) and see how it looks!
+So the `ease` function is taking a number between 0 and `duration`. It then turns that into a number between 0 and `rotateStep` which we set to 90 degrees up at the top of our program. You also provide an easing. In our case we gave `easeOutBounce` which means as we slide from 0 to `duration`, we will get a number between 0 and 90 with that easing added. Pretty crazy! Try swapping `easeOutBounce` out for [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) and see how it looks!
 
-From here, we wire everything together in `SpinSquarePair`, but that code is pretty much exactly the same as in example 2.
+From here, we wire everything together in `SpinSquarePair`, but that code is pretty much exactly the same as in example 2 and example 6.
 
 Okay, so that is the basics of doing animation with this library! It is not clear if we nailed everything here, so let us know how things go as you get more experience. Hopefully we can make it even easier!
+
+> **Note:** I expect we can build some abstractions on top of the core ideas here. This example does some lower level stuff, but I bet we can find some nice patterns to make this easier as we work with it more. If you find it weird now, try to make something better and tell us about it!
