@@ -59,18 +59,11 @@ This tutorial is all about this pattern and small variations and extensions.
 
 ## Example 1: A Counter
 
-Our first example is a simple counter that can be incremented or decremented. To see it in action, run these commands:
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/1) / [run locally](examples/1/)
 
-```bash
-git clone https://github.com/evancz/elm-architecture-tutorial/
-cd elm-architecture-tutorial
-cd examples/1
-elm-reactor
-```
+Our first example is a simple counter that can be incremented or decremented.
 
-Then open [http://localhost:8000/Counter.elm?debug](http://localhost:8000/Counter.elm?debug).
-
-This code starts with a very simple model. We just need to keep track of a single number:
+[The code](examples/1/Counter.elm) starts with a very simple model. We just need to keep track of a single number:
 
 ```elm
 type alias Model = Int
@@ -117,11 +110,14 @@ This pattern is the essense of architecting Elm programs. Every example we see f
 
 ## Starting the Program
 
-Pretty much all Elm programs will have a small bit of code that drives the whole application. In example 1 the snippet looks like this:
+Pretty much all Elm programs will have a small bit of code that drives the whole application. For each example in this tutorial, that code is broken out into `Main.elm`. For our counter example, the interesting code looks like this:
 
 ```elm
+import Counter exposing (update, view)
+import StartApp.Simple exposing (start)
+
 main =
-  StartApp.start { model = 0, update = update, view = view }
+  start { model = 0, update = update, view = view }
 ```
 
 We are use the [`StartApp`](https://github.com/evancz/start-app) package to wire together our initial model with the update and view functions. It is a small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm) so that you do not need to dive into that concept yet.
@@ -139,37 +135,29 @@ Notice we are not *performing* actions as they get sent back to our app. We are 
 
 ## Example 2: A Pair of Counters
 
-In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular? To see example 2 in action, start in the root of this repo and run:
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/2) / [run locally](examples/2/)
 
-```bash
-cd examples/2
-elm-reactor
-```
+In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular?
 
-Then open s[http://localhost:8000/CounterPair.elm?debug](http://localhost:8000/CounterPair.elm?debug).
-
-Wouldn't it be great if we could reuse all the code from example 1? The crazy thing about the Elm Architecture is that **we can reuse code with absolutely no changes**. We just create a self-contained `Counter` module that encapsulates all the implementation details:
+Wouldn't it be great if we could reuse all the code from example 1? The crazy thing about the Elm Architecture is that **we can reuse code with absolutely no changes**. When we created the `Counter` module in example one, it encapsulated all the implementation details so we can use them elsewhere:
 
 ```elm
 module Counter (Model, init, Action, update, view) where
 
-type Model = ...
+type Model
 
 init : Int -> Model
-init = ...
 
-type Action = ...
+type Action
 
 update : Action -> Model -> Model
-update = ...
 
 view : Signal.Address Action -> Model -> Html
-view = ...
 ```
 
 Creating modular code is all about creating strong abstractions. We want boundaries which appropriately expose functionality and hide implementation. From outside of the `Counter` module, we just see a basic set of values: `Model`, `init`, `Action`, `update`, and `view`. We do not care at all how these things are implemented. In fact, it is *impossible* to know how these things are implemented. This means no one can rely on implementation details that were not made public.
 
-So now that we have our basic `Counter` module, we need to use it to create our `CounterPair`. As always, we start with a `Model`:
+So we can reuse our `Counter` module, but now we need to use it to create our `CounterPair`. As always, we start with a `Model`:
 
 ```elm
 type alias Model =
@@ -233,18 +221,11 @@ That is the whole thing. The cool thing is that we can keep nesting more and mor
 
 ## Example 3: A Dynamic List of Counters
 
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/3) / [run locally](examples/3/)
+
 A pair of counters is cool, but what about a list of counters where we can add and remove counters as we see fit? Can this pattern work for that too?
 
-To see this example in action, run the following commands from the root of this repo:
-
-```bash
-cd examples/3
-elm-reactor
-```
-
-Then open [http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
-
-In this example we can reuse the `Counter` module exactly as it was in example 2.
+Again we can reuse the `Counter` module exactly as it was in example 1 and 2!
 
 ```elm
 module Counter (Model, init, Action, update, view)
@@ -339,18 +320,11 @@ This ID trick can be used any time you want a dynamic number of subcomponents. C
 
 ## Example 4: A Fancier List of Counters
 
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/4) / [run locally](examples/4/)
+
 Okay, keeping things simple and modular on a dynamic list of counters is pretty cool, but instead of a general remove button, what if each counter had its own specific remove button? Surely *that* will mess things up!
 
 Nah, it works.
-
-To see this example in action, run the following commands from the root of this repo:
-
-```bash
-cd examples/4
-elm-reactor
-```
-
-Then open [http://localhost:8000/CounterList.elm?debug](http://localhost:8000/CounterList.elm?debug).
 
 In this case our goals mean that we need a new way to view a `Counter` that adds a remove button. Interestingly, we can keep the `view` function from before and add a new `viewWithRemoveButton` function that provides a slightly different view of our underlying `Model`. This is pretty cool. We do not need to duplicate any code or do any crazy subtyping or overloading. We just add a new function to the public API to expose new functionality!
 
@@ -469,20 +443,13 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 ## Example 5: Random GIF Viewer
 
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/5) / [run locally](examples/5/)
+
 So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
 
 [fx]: http://package.elm-lang.org/packages/evancz/elm-lang/latest
 
-To follow along, run the following commands from the root of this repo:
-
-```bash
-cd examples/5
-elm-reactor
-```
-
-And then open up [http://localhost:8000](http://localhost:8000) in your browser and click on `RandomGif.elm` to try it out.
-
-As you look through the implementation, notice that it is pretty much the same code as the counter in example 1. The `Model` is very typical:
+As you look through [the implementation](examples/5/RandomGif.elm), notice that it is pretty much the same code as the counter in example 1. The `Model` is very typical:
 
 ```elm
 type alias Model =
@@ -613,18 +580,11 @@ I am going to try to explain exactly how that works, but it is not crucial to ge
 
 ## Example 6: Pair of random GIF viewers
 
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/6) / [run locally](examples/6/)
+
 Alright, effects can be done, but what about *nested* effects? Did you think about that?! This example reuses the exact code from the GIF viewer in example 5 to create a pair of independent GIF viewers.
 
-To follow along, run the following commands from the root of this repo:
-
-```bash
-cd examples/6
-elm-reactor
-```
-
-And then open up [http://localhost:8000](http://localhost:8000) in your browser and click on `RandomGifPair.elm` to try it out.
-
-As you look through the implementation, notice that it is pretty much the same code as the pair of counters in example 2. The `Model` is defined as two `RandomGif.Model` values:
+As you look through [the implementation](examples/6/RandomGifPair.elm), notice that it is pretty much the same code as the pair of counters in example 2. The `Model` is defined as two `RandomGif.Model` values:
 
 ```elm
 type alias Model =
@@ -692,43 +652,27 @@ In this case we not only use `Effects.map` to tag results appropriately, we also
 
 ## Example 7: List of random GIF viewers
 
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/7) / [run locally](examples/7/)
+
 This example lets you have a list of random GIF viewers where you can create the topics yourself. Again, we reuse the core `RandomGif` module exactly as is.
 
-To run it on your machine, run following commands from your `elm-architecture-tutorial/` directory:
-
-```bash
-cd examples/7/
-elm-reactor
-```
-
-And then open up [http://localhost:8000](http://localhost:8000) in your browser and click on `Main.elm` to try it out.
-
-When you look through [the implementation](examples/3/RandomGifList.elm) you will see that it exactly corresponds to example 3. We put all of our submodels in a list associated with an ID and do our operatons based on those IDs. The only thing new is that we are using `Effects` in the `init` and `update` function, putting them together with `Effects.map` and `Effects.batch`.
+When you look through [the implementation](examples/7/RandomGifList.elm) you will see that it exactly corresponds to example 3. We put all of our submodels in a list associated with an ID and do our operatons based on those IDs. The only thing new is that we are using `Effects` in the `init` and `update` function, putting them together with `Effects.map` and `Effects.batch`.
 
 Please open an issue if this section should go into more detail about how things work!
 
 
 ## Example 8: Animation
 
+> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/8) / [run locally](examples/8/)
+
 Now we have seen components with tasks that can be nested in arbitrary ways, but how does it work for animation?
 
-Interestingly, it is pretty much exactly the same!
+Interestingly, it is pretty much exactly the same! (Or perhaps it is no longer surprising that the same pattern as in all the other examples works here too... Seems like a pretty good pattern!)
 
 This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation lives in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
 
-To run it on your machine, run following commands from your `elm-architecture-tutorial/` directory:
-
-```bash
-cd examples/8/
-elm-reactor
-```
-
-And then open up [http://localhost:8000](http://localhost:8000) in your browser and click on `Main.elm` to try it out.
-
 > **Note:** I expect we can build some abstractions on top of the core ideas here. This example does some lower level stuff, but I bet we can find some nice patterns to make this easier as we work with it more. If you find it weird now, try to make something better and tell us about it!
 
-
-### How does it work?
 
 All the new and interesting stuff is happening in `SpinSquare`, so we are going to focus on that code. The first thing we need there is a model:
 
