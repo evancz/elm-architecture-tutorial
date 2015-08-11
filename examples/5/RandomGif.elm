@@ -6,7 +6,6 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Json
-import Start
 import Task
 
 
@@ -99,25 +98,3 @@ randomUrl topic =
 decodeUrl : Json.Decoder String
 decodeUrl =
   Json.at ["data", "image_url"] Json.string
-
-
--- SETUP
-
-app : Start.App Model
-app =
-  Start.start
-    { init = init "funny cats"
-    , update = update
-    , view = view
-    , inputs = []
-    }
-
-
-main =
-  app.html
-
-
-port tasks : Signal (Task.Task Never ())
-port tasks =
-  app.tasks
-

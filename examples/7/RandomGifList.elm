@@ -1,32 +1,13 @@
 module RandomGifList where
 
-import Effects as Fx exposing (Effects, map, batch, Never)
+import Effects exposing (Effects, map, batch, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
-import Start
 import Task
 
 import RandomGif as Gif
-
-
-app =
-  Start.start
-    { init = init
-    , update = update
-    , view = view
-    , inputs = []
-    }
-
-
-main =
-  app.html
-
-
-port tasks : Signal (Task.Task Never ())
-port tasks =
-  app.tasks
 
 
 -- MODEL
@@ -40,7 +21,9 @@ type alias Model =
 
 init : (Model, Effects Message)
 init =
-    ( Model "" [] 0, Fx.none )
+    ( Model "" [] 0
+    , Effects.none
+    )
 
 
 -- UPDATE
@@ -56,7 +39,7 @@ update message model =
     case message of
         Topic topic ->
             ( { model | topic <- topic }
-            , Fx.none
+            , Effects.none
             )
 
         Create ->
@@ -82,7 +65,7 @@ update message model =
                             , map (SubMsg id) fx
                             )
                     else
-                        (entry, Fx.none)
+                        (entry, Effects.none)
 
                 (newGifList, fxList) =
                     model.gifList
