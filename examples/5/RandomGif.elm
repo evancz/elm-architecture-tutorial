@@ -1,6 +1,6 @@
 module RandomGif where
 
-import Effects as Fx exposing (Effects, Never)
+import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
@@ -14,33 +14,33 @@ import Task
 
 type alias Model =
     { topic : String
-    , image : String
+    , gifUrl : String
     }
 
 
-init : String -> (Model, Effects Message)
+init : String -> (Model, Effects Action)
 init topic =
   ( Model topic "assets/waiting.gif"
-  , getRandomImage topic
+  , getRandomGif topic
   )
 
 
 -- UPDATE
 
-type Message
+type Action
     = RequestMore
-    | NewImage (Maybe String)
+    | NewGif (Maybe String)
 
 
-update : Message -> Model -> (Model, Effects Message)
+update : Action -> Model -> (Model, Effects Action)
 update msg model =
   case msg of
     RequestMore ->
-      (model, getRandomImage model.topic)
+      (model, getRandomGif model.topic)
 
-    NewImage maybeUrl ->
-      ( Model model.topic (Maybe.withDefault model.image maybeUrl)
-      , Fx.none
+    NewGif maybeUrl ->
+      ( Model model.topic (Maybe.withDefault model.gifUrl maybeUrl)
+      , Effects.none
       )
 
 
@@ -49,11 +49,11 @@ update msg model =
 (=>) = (,)
 
 
-view : Signal.Address Message -> Model -> Html
+view : Signal.Address Action -> Model -> Html
 view address model =
   div [ style [ "width" => "200px" ] ]
     [ h2 [headerStyle] [text model.topic]
-    , div [imgStyle model.image] []
+    , div [imgStyle model.gifUrl] []
     , button [ onClick address RequestMore ] [ text "More Please!" ]
     ]
 
@@ -80,12 +80,12 @@ imgStyle url =
 
 -- EFFECTS
 
-getRandomImage : String -> Effects Message
-getRandomImage topic =
-  Http.get decodeImageUrl (randomUrl topic)
+getRandomGif : String -> Effects Action
+getRandomGif topic =
+  Http.get decodeGifUrl (randomUrl topic)
     |> Task.toMaybe
-    |> Task.map NewImage
-    |> Fx.task
+    |> Task.map NewGif
+    |> Effects.task
 
 
 randomUrl : String -> String
@@ -96,8 +96,8 @@ randomUrl topic =
     ]
 
 
-decodeImageUrl : Json.Decoder String
-decodeImageUrl =
+decodeUrl : Json.Decoder String
+decodeUrl =
   Json.at ["data", "image_url"] Json.string
 
 
