@@ -81,7 +81,7 @@ imgStyle url =
 
 getRandomGif : String -> Effects Action
 getRandomGif topic =
-  Http.get decodeGifUrl (randomUrl topic)
+  Http.get decodeUrl (randomUrl topic)
     |> Task.toMaybe
     |> Task.map NewGif
     |> Effects.task
