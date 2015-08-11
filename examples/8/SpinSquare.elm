@@ -24,7 +24,7 @@ type alias AnimationState =
     Maybe { prevClockTime : Time,  elapsedTime: Time }
 
 
-init : Transaction Action Model
+init : (Model, Effects Action)
 init =
   ( { angle = 0, animationState = Nothing }
   , Effects.none
@@ -42,7 +42,7 @@ type Action
     | Tick Time
 
 
-update : Action -> Model -> Transaction Action Model
+update : Action -> Model -> (Model, Effects Action)
 update msg model =
   case msg of
     Spin ->
