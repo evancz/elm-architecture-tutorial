@@ -1,32 +1,36 @@
 # The Elm Architecture
 
-This tutorial outlines the general architecture you will see in all
-[Elm](http://elm-lang.org/)
-programs, from [TodoMVC](https://github.com/evancz/elm-todomvc)
-to [dreamwriter](https://github.com/rtfeldman/dreamwriter#dreamwriter).
+This tutorial outlines the general architecture you will see in all [Elm][] programs, from [TodoMVC][] and [dreamwriter][] to the code running in production at [NoRedInk][] and [CircuitHub][].
+
+[Elm]: http://elm-lang.org/
+[TodoMVC]: https://github.com/evancz/elm-todomvc
+[dreamwriter]: https://github.com/rtfeldman/dreamwriter#dreamwriter
+[NoRedInk]: https://www.noredink.com/
+[CircuitHub]: https://www.circuithub.com/
 
 We will learn a very simple architecture pattern that serves as an infinitely
 nestable building block. It is great for modularity, code reuse, and testing.
 Ultimately, this pattern makes it easy to create complex webapps in a way that
 stays modular. We will start with the basic pattern in a small example and slowly
-build on those core principles.
+build on those core principles. As a preview, the examples are:
 
-One very interesting aspect of this architecture is that it *emerges* from
-Elm naturally. The language design itself leads you towards this architecture
-whether you have read this document and know the benefits or not. I actually
-discovered this pattern just using Elm and have been shocked by its simplicity
-and power.
+  1. Counter
+  2. Pair of counters
+  3. List of counters
+  4. List of counters (variation)
+  5. GIF fetcher
+  6. Pair of GIF fetchers
+  7. List of GIF fetchers
+  8. Pair of animating squares
 
-**Note**: To follow along with this tutorial with code,
-[install Elm](http://elm-lang.org/Install.elm) and fork this repo. Each
-example in the tutorial gives instructions of how to run the code.
+One very interesting aspect of the architecture in all these programs is that it *emerges* from Elm naturally. The language design itself leads you towards this architecture whether you have read this document and know the benefits or not. I actually discovered this pattern just using Elm and have been shocked by its simplicity and power.
+
+**Note**: To follow along with this tutorial with code, [install Elm](http://elm-lang.org/install) and fork this repo. Each example in the tutorial gives instructions of how to run the code.
+
 
 ## The Basic Pattern
 
-The logic of every Elm program will break up into three cleanly separated
-parts: model, update, and view. You can pretty reliably start with the
-following skeleton and then iteratively fill in details for your particular
-case.
+The logic of every Elm program will break up into three cleanly separated parts: model, update, and view. You can pretty reliably start with the following skeleton and then iteratively fill in details for your particular case.
 
 ```elm
 -- MODEL
@@ -544,29 +548,5 @@ you just call the function with the arguments you would like to test.
 [pure]: http://en.wikipedia.org/wiki/Pure_function
 
 
-## One Last Pattern
+## Example 5: Random GIF Viewer
 
-There is one last important way to extend the basic pattern. For example, maybe
-you have a component that gets updated, and depending on the result, you need
-to change something else in your program. You can extend your `update` function
-to return extra information.
-
-```elm
-type Request = RefreshPage | Print
-
-update : Action -> Model -> (Model, Maybe Request)
-```
-
-Depending on the logic of the `update` we may be telling someone above us to
-refresh the content or print stuff out. The same sort of pattern can be used
-if a component can delete itself:
-
-```elm
-update : Action -> Model -> Maybe Model
-```
-
-If this is not clear, maybe I will write example 5 that shows this pattern in
-action. In the meantime, you can see examples like this in [the fancy version
-of the TodoMVC app written in Elm][fancy].
-
-[fancy]: https://github.com/evancz/elm-todomvc/blob/trim/Todo.elm
