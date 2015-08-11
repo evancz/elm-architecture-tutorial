@@ -644,7 +644,7 @@ type Action
 The interesting thing is that we actually use the `Left` and `Right` tags a bit in our `update` and `init` functions.
 
 ```elm
--- FX.map : (a -> b) -> Effects a -> Effects b
+-- Effects.map : (a -> b) -> Effects a -> Effects b
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -654,7 +654,7 @@ update action model =
         (left, fx) = RandomGif.update msg model.left
       in
         ( Model left model.right
-        , FX.map Left fx
+        , Effects.map Left fx
         )
 
     Right msg ->
@@ -662,7 +662,7 @@ update action model =
         (right, fx) = RandomGif.update msg model.right
       in
         ( Model model.left right
-        , FX.map Right fx
+        , Effects.map Right fx
         )
 ```
 
@@ -678,13 +678,13 @@ init leftTopic rightTopic =
     (right, rightFx) = RandomGif.init rightTopic
   in
     ( Model left right
-    , FX.batch
-        [ FX.map Left leftFx
-        , FX.map Right rightFx
+    , Effects.batch
+        [ Effects.map Left leftFx
+        , Effects.map Right rightFx
         ]
     )
 
--- FX.batch : List (Effects a) -> Effects a
+-- Effects.batch : List (Effects a) -> Effects a
 ```
 
 In this case we not only use `Effects.map` to tag results appropriately, we also use the [`Effects.batch`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#batch) function to lump them all together. All of the requested tasks will get spawned off and run independently, so the left and right effects will be in progress at the same time.
