@@ -4,15 +4,6 @@ import Counter
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import StartApp
-
-
-main =
-  StartApp.start
-    { model = init
-    , update = update
-    , view = view
-    }
 
 
 -- MODEL
