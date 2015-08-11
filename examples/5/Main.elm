@@ -1,11 +1,13 @@
 
+import Effects exposing (Never)
 import RandomGif exposing (init, update, view)
 import StartApp
+import Task
 
 
 app =
   StartApp.start
-    { init = init "funny cats" "funny dogs"
+    { init = init "funny cats"
     , update = update
     , view = view
     , inputs = []

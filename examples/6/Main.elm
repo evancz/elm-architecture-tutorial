@@ -1,6 +1,8 @@
 
+import Effects exposing (Never)
 import RandomGifPair exposing (init, update, view)
 import StartApp
+import Task
 
 
 app =

@@ -3,9 +3,7 @@ module SpinSquarePair where
 import Effects exposing (Effects)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import SpinSquare
-import Task
 
 
 -- MODEL
