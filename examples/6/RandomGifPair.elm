@@ -1,87 +1,69 @@
 module RandomGifPair where
 
-import Effects as Fx exposing (Effects, map, batch, Never)
+import Effects exposing (Effects)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Start
 import Task
 
-import RandomGif as Gif
-
-
-app =
-  Start.start
-    { init = init "funny cats" "funny dogs"
-    , update = update
-    , view = view
-    , inputs = []
-    }
-
-
-main =
-  app.html
-
-
-port tasks : Signal (Task.Task Never ())
-port tasks =
-  app.tasks
+import RandomGif
 
 
 -- MODEL
 
 type alias Model =
-    { left : Gif.Model
-    , right : Gif.Model
+    { left : RandomGif.Model
+    , right : RandomGif.Model
     }
 
 
-init : String -> String -> (Model, Effects Message)
+init : String -> String -> (Model, Effects Action)
 init leftTopic rightTopic =
   let
-    (model1, fx1) = Gif.init leftTopic
-    (model2, fx2) = Gif.init rightTopic
+    (left, leftFx) = RandomGif.init leftTopic
+    (right, rightFx) = RandomGif.init rightTopic
   in
-    ( Model model1 model2
-    , batch [map Left fx1, map Right fx2]
+    ( Model left right
+    , Effects.batch
+        [ Effects.map Left leftFx
+        , Effects.map Right rightFx
+        ]
     )
 
 
 -- UPDATE
 
-type Message
-    = Left Gif.Message
-    | Right Gif.Message
+type Action
+    = Left RandomGif.Action
+    | Right RandomGif.Action
 
 
-update : Message -> Model -> (Model, Effects Message)
+update : Action -> Model -> (Model, Effects Action)
 update message model =
   case message of
     Left msg ->
       let
-        (left, fx) = Gif.update msg model.left
+        (left, fx) = RandomGif.update msg model.left
       in
         ( Model left model.right
-        , map Left fx
+        , Effects.map Left fx
         )
 
     Right msg ->
       let
-        (right, fx) = Gif.update msg model.right
+        (right, fx) = RandomGif.update msg model.right
       in
         ( Model model.left right
-        , map Right fx
+        , Effects.map Right fx
         )
 
 
 -- VIEW
 
-(=>) = (,)
-
-
-view : Signal.Address Message -> Model -> Html
+view : Signal.Address Action -> Model -> Html
 view address model =
-  div [ style [ "display" => "flex" ] ]
-    [ Gif.view (Signal.forwardTo address Left) model.left
-    , Gif.view (Signal.forwardTo address Right) model.right
+  div [ style [ ("display", "flex") ] ]
+    [ RandomGif.view (Signal.forwardTo address Left) model.left
+    , RandomGif.view (Signal.forwardTo address Right) model.right
     ]
