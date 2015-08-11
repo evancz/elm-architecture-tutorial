@@ -32,8 +32,8 @@ type Action
 
 
 update : Action -> Model -> (Model, Effects Action)
-update msg model =
-  case msg of
+update action model =
+  case action of
     RequestMore ->
       (model, getRandomGif model.topic)
 

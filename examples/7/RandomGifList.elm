@@ -7,19 +7,19 @@ import Html.Events exposing (..)
 import Json.Decode as Json
 import Task
 
-import RandomGif as Gif
+import RandomGif
 
 
 -- MODEL
 
 type alias Model =
     { topic : String
-    , gifList : List (Int, Gif.Model)
+    , gifList : List (Int, RandomGif.Model)
     , uid : Int
     }
 
 
-init : (Model, Effects Message)
+init : (Model, Effects Action)
 init =
     ( Model "" [] 0
     , Effects.none
@@ -28,13 +28,13 @@ init =
 
 -- UPDATE
 
-type Message
+type Action
     = Topic String
     | Create
-    | SubMsg Int Gif.Message
+    | SubMsg Int RandomGif.Action
 
 
-update : Message -> Model -> (Model, Effects Message)
+update : Action -> Model -> (Model, Effects Action)
 update message model =
     case message of
         Topic topic ->
@@ -45,7 +45,7 @@ update message model =
         Create ->
             let
                 (newRandomGif, fx) =
-                    Gif.init model.topic
+                    RandomGif.init model.topic
 
                 newModel =
                     Model "" (model.gifList ++ [(model.uid, newRandomGif)]) (model.uid + 1)
@@ -59,7 +59,7 @@ update message model =
                 subUpdate ((id, randomGif) as entry) =
                     if id == msgId then
                         let
-                            (newRandomGif, fx) = Gif.update msg randomGif
+                            (newRandomGif, fx) = RandomGif.update msg randomGif
                         in
                             ( (id, newRandomGif)
                             , map (SubMsg id) fx
@@ -82,7 +82,7 @@ update message model =
 (=>) = (,)
 
 
-view : Signal.Address Message -> Model -> Html
+view : Signal.Address Action -> Model -> Html
 view address model =
     div []
         [ input
@@ -98,9 +98,9 @@ view address model =
         ]
 
 
-elementView : Signal.Address Message -> (Int, Gif.Model) -> Html
+elementView : Signal.Address Action -> (Int, RandomGif.Model) -> Html
 elementView address (id, model) =
-    Gif.view (Signal.forwardTo address (SubMsg id)) model
+    RandomGif.view (Signal.forwardTo address (SubMsg id)) model
 
 
 inputStyle : Attribute

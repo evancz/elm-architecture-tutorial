@@ -1,30 +1,11 @@
 module SpinSquarePair where
 
+import Effects exposing (Effects)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import SpinSquare
-import Start
 import Task
-import Transaction exposing (Transaction, done, tag, with, with2, Never)
-
-
-app =
-  Start.start
-    { init = init
-    , update = update
-    , view = view
-    , inputs = []
-    }
-
-
-main =
-  app.html
-
-
-port tasks : Signal (Task.Task Never ())
-port tasks =
-  app.tasks
 
 
 -- MODEL
@@ -35,33 +16,46 @@ type alias Model =
     }
 
 
-init : Transaction Message Model
+init : (Model, Effects Action)
 init =
-  with2
-    (tag Left SpinSquare.init)
-    (tag Right SpinSquare.init)
-    (\left right -> done { left = left, right = right })
+  let
+    (left, leftFx) = SpinSquare.init
+    (right, rightFx) = SpinSquare.init
+  in
+    ( Model left right
+    , Effects.batch
+        [ Effects.map Left leftFx
+        , Effects.map Right rightFx
+        ]
+    )
 
 
 -- UPDATE
 
-type Message
-    = Left SpinSquare.Message
-    | Right SpinSquare.Message
+type Action
+    = Left SpinSquare.Action
+    | Right SpinSquare.Action
 
 
-update : Message -> Model -> Transaction Message Model
-update message model =
-  case message of
-    Left msg ->
-      with
-        (tag Left <| SpinSquare.update msg model.left)
-        (\left -> done { model | left <- left })
+update : Action -> Model -> (Model, Effects Action)
+update action model =
+  case action of
+    Left act ->
+      let
+        (left, fx) = SpinSquare.update act model.left
+      in
+        ( Model left model.right
+        , Effects.map Left fx
+        )
 
-    Right msg ->
-      with
-        (tag Right <| SpinSquare.update msg model.right)
-        (\right -> done { model | right <- right })
+    Right act ->
+      let
+        (right, fx) = SpinSquare.update act model.right
+      in
+        ( Model model.left right
+        , Effects.map Right fx
+        )
+
 
 
 -- VIEW
@@ -69,7 +63,7 @@ update message model =
 (=>) = (,)
 
 
-view : Signal.Address Message -> Model -> Html
+view : Signal.Address Action -> Model -> Html
 view address model =
   div [ style [ "display" => "flex" ] ]
     [ SpinSquare.view (Signal.forwardTo address Left) model.left

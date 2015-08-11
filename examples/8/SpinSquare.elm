@@ -1,6 +1,7 @@
-module SpinSquare (Model, Message, init, update, view) where
+module SpinSquare (Model, Action, init, update, view) where
 
 import Easing exposing (ease, easeOutBounce, float)
+import Effects exposing (Effects)
 import Html exposing (Html)
 import Http
 import Json.Decode as Json
@@ -8,77 +9,91 @@ import Svg exposing (svg, rect, g, text, text')
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (onClick)
 import Task
-import Transaction exposing (Transaction, done, requestTick, Never)
+import Time exposing (Time, second)
 
 
 -- MODEL
 
 type alias Model =
     { angle : Float
-    , animationState : Maybe { prevClockTime : Float, count : Float }
+    , animationState : AnimationState
     }
 
 
-init : Transaction Message Model
+type alias AnimationState =
+    Maybe { prevClockTime : Time,  elapsedTime: Time }
+
+
+init : Transaction Action Model
 init =
-  done { angle = 0, animationState = Nothing }
+  ( { angle = 0, animationState = Nothing }
+  , Effects.none
+  )
 
 
 rotateStep = 90
+duration = second
 
 
 -- UPDATE
 
-type Message
+type Action
     = Spin
-    | Tick Float
+    | Tick Time
 
 
-update : Message -> Model -> Transaction Message Model
+update : Action -> Model -> Transaction Action Model
 update msg model =
   case msg of
     Spin ->
       case model.animationState of
         Nothing ->
-          requestTick Tick model
+          ( model, Effects.tick Tick )
 
         Just _ ->
-          done model
+          ( model, Effects.none )
 
     Tick clockTime ->
       let
-        newCount =
+        newElapsedTime =
           case model.animationState of
             Nothing ->
               0
 
-            Just {count, prevClockTime} ->
-              count + (clockTime - prevClockTime)
+            Just {elapsedTime, prevClockTime} ->
+              elapsedTime + (clockTime - prevClockTime)
       in
-        if newCount > 1000 then
-          done
-            { angle = model.angle + rotateStep
+        if newElapsedTime > duration then
+          ( { angle = model.angle + rotateStep
             , animationState = Nothing
             }
+          , Effects.none
+          )
         else
-          requestTick Tick
-            { angle = model.angle
-            , animationState = Just { count = newCount, prevClockTime = clockTime }
+          ( { angle = model.angle
+            , animationState = Just { elapsedTime = newElapsedTime, prevClockTime = clockTime }
             }
+          , Effects.tick Tick
+          )
 
 
 -- VIEW
 
-view : Signal.Address Message -> Model -> Html
+toOffset : AnimationState -> Float
+toOffset animationState =
+  case animationState of
+    Nothing ->
+      0
+
+    Just {elapsedTime} ->
+      ease easeOutBounce float 0 rotateStep duration elapsedTime
+
+
+view : Signal.Address Action -> Model -> Html
 view address model =
   let
     angle =
-      case model.animationState of
-        Nothing ->
-          model.angle
-
-        Just {count} ->
-          model.angle + ease easeOutBounce float 0 rotateStep 1000 count
+      model.angle + toOffset model.animationState
   in
     svg
       [ width "200", height "200", viewBox "0 0 200 200" ]

@@ -4,7 +4,6 @@ import Effects exposing (Effects)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Start
 import Task
 
 import RandomGif
@@ -40,19 +39,19 @@ type Action
 
 
 update : Action -> Model -> (Model, Effects Action)
-update message model =
-  case message of
-    Left msg ->
+update action model =
+  case action of
+    Left act ->
       let
-        (left, fx) = RandomGif.update msg model.left
+        (left, fx) = RandomGif.update act model.left
       in
         ( Model left model.right
         , Effects.map Left fx
         )
 
-    Right msg ->
+    Right act ->
       let
-        (right, fx) = RandomGif.update msg model.right
+        (right, fx) = RandomGif.update act model.right
       in
         ( Model model.left right
         , Effects.map Right fx
