@@ -469,3 +469,226 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 ## Example 5: Random GIF Viewer
 
+So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
+
+[fx]: http://package.elm-lang.org/packages/evancz/elm-lang/latest
+
+To follow along, run the following commands from the root of this repo:
+
+```bash
+cd examples/5
+elm-reactor
+```
+
+And then open up [http://localhost:8000](http://localhost:8000) in your browser and click on `RandomGif.elm` to try it out.
+
+As you look through the implementation, notice that it is pretty much the same code as the counter in example 1. The `Model` is very typical:
+
+```elm
+type alias Model =
+    { topic : String
+    , gifUrl : String
+    }
+```
+
+We need to know what the `topic` of the finder is and what `gifUrl` we are showing right this second. The only new thing in this example is that `init` and `update` have slightly fancier types:
+
+```elm
+init : String -> (Model, Effects Action)
+
+update : Action -> Model -> (Model, Effects Action)
+```
+
+Instead of returning just a new `Model` we also give back some effects that we would like to run. So we will be using [the `Effects` API][fx_api], which looks something like this:
+
+[fx_api]: http://package.elm-lang.org/packages/evancz/elm-lang/latest/Effects
+
+```elm
+module Effects where
+
+type Effects a
+
+none : Effects a
+  -- don't do anything
+
+task : Task Never a -> Effects a
+  -- request a task, do HTTP and database stuff
+```
+
+The `Effects` type is essentially a data structure holding a bunch of independent tasks that will get run at some later point. Let’s get a better feeling of how this works by checking out how `update` works in this example:
+
+```elm
+type Action
+    = RequestMore
+    | NewGif (Maybe String)
+
+
+update : Action -> Model -> (Model, Effects Action)
+update msg model =
+  case msg of
+    RequestMore ->
+      ( model
+      , getRandomGif model.topic
+      )
+
+    NewGif maybeUrl ->
+      ( Model model.topic (Maybe.withDefault model.gifUrl maybeUrl)
+      , Effects.none
+      )
+
+-- getRandomGif : String -> Effects Action
+```
+
+So the user can trigger a `RequestMore` action by clicking the “More Please!” button, and when the server responds it will give us a `NewGif` action. We handle both these scenarios in our `update` function.
+
+In the case of `RequestMore` first return the existing model. The user just clicked a button, there is nothing to change right now. We also create an `Effects Action` using the `getRandomGif` function. We will get to how `getRandomGif` is defined soon. For now we just need to know that when an `Effects Action` is run, it will produce a bunch of `Action` values that will be routed throughout the application. So `getRandomGif model.topic` will eventually result in a action like this:
+
+```elm
+NewGif (Just "http://s3.amazonaws.com/giphygifs/media/ka1aeBvFCSLD2/giphy.gif")
+```
+
+It returns a `Maybe` because the request to the server may fail. That `Action` will get fed right back into our `update` function. So when we take the `NewGif` route we just update the current `image` if possible. If the request failed, we just stick with the current `model.image`.
+
+We see the same kind of thing happening in `init` which defines the initial model and asks for a GIF in the correct topic from giphy.com’s API.
+
+```elm
+init : String -> (Model, Effects Action)
+init topic =
+  ( Model topic "assets/waiting.gif"
+  , getRandomGif topic
+  )
+
+-- getRandomGif : String -> Effects Action
+```
+
+Again, when the random GIF effect is complete, it will produce an `Action` that gets routed to our `update` function.
+
+> **Note:** So far we have been using the `StartApp.Simple` module from [the start-app package](http://package.elm-lang.org/packages/evancz/start-app/latest), but now upgrade to the `StartApp` module. It is able to handle the complexity of more realistic web apps. It has [a slightly fancier API](http://package.elm-lang.org/packages/evancz/start-app/latest/StartApp). The crucial change is that it can handle our new `init` and `update` types.
+
+One of the crucial aspects of this example is the `getRandomGif` function that actually describes how to get a random GIF. It uses [tasks][] and [the `Http` package][http], and I will try to give an overview of how these things are being used as we go. Let’s look at the definition:
+
+[tasks]: http://elm-lang.org/guide/reactivity#tasks
+[http]: http://package.elm-lang.org/packages/evancz/elm-http/latest
+
+```elm
+getRandomGif : String -> Effects Action
+getRandomGif topic =
+  Http.get decodeImageUrl (randomUrl topic)
+    |> Task.toMaybe
+    |> Task.map NewImage
+    |> Effects.task
+
+-- The first line there created an HTTP GET request. It tries to
+-- get some JSON at `randomUrl topic` and decodes the result
+-- with `decodeImage`. Both are defined below!
+--
+-- Next we use `Task.toMaybe` to capture any potential failures and
+-- apply the `NewImage` tag to turn the result into a `Action`.
+-- Finally we turn it into an `Effects` value that can be used in our
+-- `init` or `update` functions.
+
+
+-- Given a topic, construct a URL for the giphy API.
+randomUrl : String -> String
+randomUrl topic =
+  Http.url "http://api.giphy.com/v1/gifs/random"
+    [ "api_key" => "dc6zaTOxFJmzC"
+    , "tag" => topic
+    ]
+
+
+-- A JSON decoder that takes a big chunk of JSON spit out by
+-- giphy and extracts the string at `json.data.image_url` 
+decodeImageUrl : Json.Decoder String
+decodeImageUrl =
+  Json.at ["data", "image_url"] Json.string
+```
+
+Once we have written this up, we are able to reuse `getRandomGif` in our `init` and `update` functions.
+
+One of the interesting things about the task returned by `getRandomGif` is that it can `Never` fail. The idea is that any potential failure *must* be handled explicitly. We do not want any tasks failing silently.
+
+I am going to try to explain exactly how that works, but it is not crucial to get every piece of this to use things! Okay, so every `Task` has a failure type and a success type. For example, an HTTP task may have a type like this `Task Http.Error String` such that we can fail with an `Http.Error` or succeed with a `String`. This makes it nice to chain a bunch of tasks together without worrying too much about errors. Now lets say our component requests a task, but the task fails. What happens then? Who gets notified? How do we recover? By making the failure type `Never` we force any potential errors into the success type such that they can be handled explicitly by the component. In our case, we use `Task.toMaybe : Task x a -> Task y (Maybe a)` so our `update` function must explicitly handle HTTP failures. This means tasks cannot silently fail, you always handle potential errors explicitly.
+
+
+## Example 6: Pair of random GIF viewers
+
+Alright, effects can be done, but what about *nested* effects? Did you think about that?! This example reuses the exact code from the GIF viewer in example 5 to create a pair of independent GIF viewers.
+
+To follow along, run the following commands from the root of this repo:
+
+```bash
+cd examples/6
+elm-reactor
+```
+
+And then open up [http://localhost:8000](http://localhost:8000) in your browser and click on `RandomGifPair.elm` to try it out.
+
+As you look through the implementation, notice that it is pretty much the same code as the pair of counters in example 2. The `Model` is defined as two `RandomGif.Model` values:
+
+```elm
+type alias Model =
+    { left : RandomGif.Model
+    , right : RandomGif.Model
+    }
+```
+
+This lets us keep track of each independently. Our actions are just routing messages to the appropriate subcomponent.
+
+```elm
+type Action
+    = Left RandomGif.Action
+    | Right RandomGif.Action
+```
+
+The interesting thing is that we actually use the `Left` and `Right` tags a bit in our `update` and `init` functions.
+
+```elm
+-- FX.map : (a -> b) -> Effects a -> Effects b
+
+update : Action -> Model -> (Model, Effects Action)
+update action model =
+  case action of
+    Left msg ->
+      let
+        (left, fx) = RandomGif.update msg model.left
+      in
+        ( Model left model.right
+        , FX.map Left fx
+        )
+
+    Right msg ->
+      let
+        (right, fx) = RandomGif.update msg model.right
+      in
+        ( Model model.left right
+        , FX.map Right fx
+        )
+```
+
+So in each branch we call the `RandomGif.update` function which is returning a new model and some effects we are calling `fx`. We return an updated model like normal, but we need to do some extra work on our effects. Instead of returning them directly, we use [`Effects.map`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#map) function to turn them into the same kind of `Action`. This works very much like `Signal.forwardTo`, letting us tag the values to make it clear how they should be routed.
+
+The same thing happens in the `init` function. We provide a topic for each random GIF viewer and get back an initial model and some effects.
+
+```elm
+init : String -> String -> (Model, Effects Action)
+init leftTopic rightTopic =
+  let
+    (left, leftFx) = RandomGif.init leftTopic
+    (right, rightFx) = RandomGif.init rightTopic
+  in
+    ( Model left right
+    , FX.batch
+        [ FX.map Left leftFx
+        , FX.map Right rightFx
+        ]
+    )
+
+-- FX.batch : List (Effects a) -> Effects a
+```
+
+In this case we not only use `Effects.map` to tag results appropriately, we also use the [`Effects.batch`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#batch) function to lump them all together. All of the requested tasks will get spawned off and run independently, so the left and right effects will be in progress at the same time.
+
+
+## Example 7: List of random GIF viewers
+
