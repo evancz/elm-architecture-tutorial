@@ -8,18 +8,18 @@ This tutorial outlines “The Elm Architecture” which you will see in all [Elm
 [NoRedInk]: https://www.noredink.com/
 [CircuitHub]: https://www.circuithub.com/
 
-The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex webapps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
+The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex web apps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
 
-  1. Counter
-  2. Pair of counters
-  3. List of counters
-  4. List of counters (variation)
-  5. GIF fetcher
-  6. Pair of GIF fetchers
-  7. List of GIF fetchers
-  8. Pair of animating squares
+  1. [Counter](https://evancz.github.io/elm-architecture-tutorial/examples/1)
+  2. [Pair of counters](https://evancz.github.io/elm-architecture-tutorial/examples/2)
+  3. [List of counters](https://evancz.github.io/elm-architecture-tutorial/examples/3)
+  4. [List of counters (variation)](https://evancz.github.io/elm-architecture-tutorial/examples/4)
+  5. [GIF fetcher](https://evancz.github.io/elm-architecture-tutorial/examples/5)
+  6. [Pair of GIF fetchers](https://evancz.github.io/elm-architecture-tutorial/examples/6)
+  7. [List of GIF fetchers](https://evancz.github.io/elm-architecture-tutorial/examples/7)
+  8. [Pair of animating squares](https://evancz.github.io/elm-architecture-tutorial/examples/8)
 
-It helps to go through them in order (and with the tutorial here, it helps!)
+This tutorial will really help! It it will bring out the concepts and ideas necessary to get to make examples 7 and 8 super easy. Investing in the foundation will be worth it!
 
 One very interesting aspect of the architecture in all these programs is that it *emerges* from Elm naturally. The language design itself leads you towards this architecture whether you have read this document and know the benefits or not. I actually discovered this pattern just using Elm and have been shocked by its simplicity and power.
 
