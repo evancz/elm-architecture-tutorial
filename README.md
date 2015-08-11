@@ -1,6 +1,6 @@
 # The Elm Architecture
 
-This tutorial outlines the general architecture you will see in all [Elm][] programs, from [TodoMVC][] and [dreamwriter][] to the code running in production at [NoRedInk][] and [CircuitHub][].
+This tutorial outlines “The Elm Architecture” which you will see in all [Elm][] programs, from [TodoMVC][] and [dreamwriter][] to the code running in production at [NoRedInk][] and [CircuitHub][]. The basic pattern is useful whether you are writing your front-end in Elm or JS or whatever else.
 
 [Elm]: http://elm-lang.org/
 [TodoMVC]: https://github.com/evancz/elm-todomvc
@@ -8,7 +8,7 @@ This tutorial outlines the general architecture you will see in all [Elm][] prog
 [NoRedInk]: https://www.noredink.com/
 [CircuitHub]: https://www.circuithub.com/
 
-We will learn a very simple architecture pattern that serves as an infinitely nestable building block. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex webapps in a way that stays modular. We will start with the basic pattern in a small example and slowly build on those core principles. As a preview, the examples are:
+The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex webapps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
 
   1. Counter
   2. Pair of counters
@@ -18,6 +18,8 @@ We will learn a very simple architecture pattern that serves as an infinitely ne
   6. Pair of GIF fetchers
   7. List of GIF fetchers
   8. Pair of animating squares
+
+It helps to go through them in order (and with the tutorial here, it helps!)
 
 One very interesting aspect of the architecture in all these programs is that it *emerges* from Elm naturally. The language design itself leads you towards this architecture whether you have read this document and know the benefits or not. I actually discovered this pattern just using Elm and have been shocked by its simplicity and power.
 
