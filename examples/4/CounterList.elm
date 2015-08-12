@@ -4,15 +4,6 @@ import Counter
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import StartApp
-
-
-main =
-  StartApp.start
-    { model = init
-    , update = update
-    , view = view
-    }
 
 
 -- MODEL
@@ -36,7 +27,7 @@ init =
 
 type Action
     = Insert
-    | Remove
+    | Remove ID
     | Modify ID Counter.Action
 
 
@@ -44,16 +35,15 @@ update : Action -> Model -> Model
 update action model =
   case action of
     Insert ->
-      let newCounter = ( model.nextID, Counter.init 0 )
-          newCounters = model.counters ++ [ newCounter ]
-      in
-          { model |
-              counters <- newCounters,
-              nextID <- model.nextID + 1
-          }
+      { model |
+          counters <- ( model.nextID, Counter.init 0 ) :: model.counters,
+          nextID <- model.nextID + 1
+      }
 
-    Remove ->
-      { model | counters <- List.drop 1 model.counters }
+    Remove id ->
+      { model |
+          counters <- List.filter (\(counterID, _) -> counterID /= id) model.counters
+      }
 
     Modify id counterAction ->
       let updateCounter (counterID, counterModel) =
@@ -68,13 +58,16 @@ update action model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  let counters = List.map (viewCounter address) model.counters
-      remove = button [ onClick address Remove ] [ text "Remove" ]
-      insert = button [ onClick address Insert ] [ text "Add" ]
+  let insert = button [ onClick address Insert ] [ text "Add" ]
   in
-      div [] ([remove, insert] ++ counters)
+      div [] (insert :: List.map (viewCounter address) model.counters)
 
 
 viewCounter : Signal.Address Action -> (ID, Counter.Model) -> Html
 viewCounter address (id, model) =
-  Counter.view (Signal.forwardTo address (Modify id)) model
+  let context =
+        Counter.Context
+          (Signal.forwardTo address (Modify id))
+          (Signal.forwardTo address (always (Remove id)))
+  in
+      Counter.viewWithRemoveButton context model

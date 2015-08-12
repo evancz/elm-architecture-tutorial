@@ -3,15 +3,6 @@ module Counter where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
-import StartApp
-
-
-main =
-  StartApp.start
-    { model = 0
-    , update = update
-    , view = view
-    }
 
 
 -- MODEL
