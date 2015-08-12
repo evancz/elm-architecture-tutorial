@@ -111,7 +111,7 @@ countStyle =
 
 The tricky thing about our `view` function is the `Address`. We will dive into that in the next section! For now, I just want you to notice that **this code is entirely declarative**. We take in a `Model` and produce some `Html`. That is it. At no point do we mutate the DOM manually, which gives the library [much more freedom to make clever optimizations][elm-html] and actually makes rendering *faster* overall. It is crazy. Furthermore, `view` is a plain old function so we can get the full power of Elm&rsquo;s module system, test frameworks, and libraries when creating views.
 
-This pattern is the essense of architecting Elm programs. Every example we see from now on will be a slight variation on this basic pattern: `Model`, `update`, `view`.
+This pattern is the essence of architecting Elm programs. Every example we see from now on will be a slight variation on this basic pattern: `Model`, `update`, `view`.
 
 
 ## Starting the Program
@@ -424,7 +424,7 @@ viewCounter address (id, model) =
       Counter.viewWithRemoveButton context model
 ```
 
-In our `viewCounter` function, we construct the `Counter.Context` to pass in all the nesessary forwarding addresses. In both cases we annotate each `Counter.Action` so that we know which counter to modify or remove.
+In our `viewCounter` function, we construct the `Counter.Context` to pass in all the necessary forwarding addresses. In both cases we annotate each `Counter.Action` so that we know which counter to modify or remove.
 
 
 ## Big Lessons So Far
@@ -662,7 +662,7 @@ In this case we not only use `Effects.map` to tag results appropriately, we also
 
 This example lets you have a list of random GIF viewers where you can create the topics yourself. Again, we reuse the core `RandomGif` module exactly as is.
 
-When you look through [the implementation](examples/7/RandomGifList.elm) you will see that it exactly corresponds to example 3. We put all of our submodels in a list associated with an ID and do our operatons based on those IDs. The only thing new is that we are using `Effects` in the `init` and `update` function, putting them together with `Effects.map` and `Effects.batch`.
+When you look through [the implementation](examples/7/RandomGifList.elm) you will see that it exactly corresponds to example 3. We put all of our submodels in a list associated with an ID and do our operations based on those IDs. The only thing new is that we are using `Effects` in the `init` and `update` function, putting them together with `Effects.map` and `Effects.batch`.
 
 Please open an issue if this section should go into more detail about how things work!
 
