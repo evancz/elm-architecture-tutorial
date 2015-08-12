@@ -10,14 +10,14 @@ This tutorial outlines “The Elm Architecture” which you will see in all [Elm
 
 The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex web apps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
 
-  1. [Counter](https://evancz.github.io/elm-architecture-tutorial/examples/1)
-  2. [Pair of counters](https://evancz.github.io/elm-architecture-tutorial/examples/2)
-  3. [List of counters](https://evancz.github.io/elm-architecture-tutorial/examples/3)
-  4. [List of counters (variation)](https://evancz.github.io/elm-architecture-tutorial/examples/4)
-  5. [GIF fetcher](https://evancz.github.io/elm-architecture-tutorial/examples/5)
-  6. [Pair of GIF fetchers](https://evancz.github.io/elm-architecture-tutorial/examples/6)
-  7. [List of GIF fetchers](https://evancz.github.io/elm-architecture-tutorial/examples/7)
-  8. [Pair of animating squares](https://evancz.github.io/elm-architecture-tutorial/examples/8)
+  1. [Counter](https://evancz.github.io/elm-architecture-tutorial/examples/1.html)
+  2. [Pair of counters](https://evancz.github.io/elm-architecture-tutorial/examples/2.html)
+  3. [List of counters](https://evancz.github.io/elm-architecture-tutorial/examples/3.html)
+  4. [List of counters (variation)](https://evancz.github.io/elm-architecture-tutorial/examples/4.html)
+  5. [GIF fetcher](https://evancz.github.io/elm-architecture-tutorial/examples/5.html)
+  6. [Pair of GIF fetchers](https://evancz.github.io/elm-architecture-tutorial/examples/6.html)
+  7. [List of GIF fetchers](https://evancz.github.io/elm-architecture-tutorial/examples/7.html)
+  8. [Pair of animating squares](https://evancz.github.io/elm-architecture-tutorial/examples/8.html)
 
 This tutorial will really help! It it will bring out the concepts and ideas necessary to get to make examples 7 and 8 super easy. Investing in the foundation will be worth it!
 
@@ -65,7 +65,7 @@ This tutorial is all about this pattern and small variations and extensions.
 
 ## Example 1: A Counter
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/1) / [run locally](examples/1/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/1.html) / [run locally](examples/1/)**
 
 Our first example is a simple counter that can be incremented or decremented.
 
@@ -141,7 +141,7 @@ Notice we are not *performing* actions as they get sent back to our app. We are 
 
 ## Example 2: A Pair of Counters
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/2) / [run locally](examples/2/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/2.html) / [run locally](examples/2/)**
 
 In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular?
 
@@ -227,7 +227,7 @@ That is the whole thing. The cool thing is that we can keep nesting more and mor
 
 ## Example 3: A Dynamic List of Counters
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/3) / [run locally](examples/3/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/3.html) / [run locally](examples/3/)**
 
 A pair of counters is cool, but what about a list of counters where we can add and remove counters as we see fit? Can this pattern work for that too?
 
@@ -326,7 +326,7 @@ This ID trick can be used any time you want a dynamic number of subcomponents. C
 
 ## Example 4: A Fancier List of Counters
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/4) / [run locally](examples/4/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/4.html) / [run locally](examples/4/)**
 
 Okay, keeping things simple and modular on a dynamic list of counters is pretty cool, but instead of a general remove button, what if each counter had its own specific remove button? Surely *that* will mess things up!
 
@@ -449,7 +449,7 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 ## Example 5: Random GIF Viewer
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/5) / [run locally](examples/5/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/5.html) / [run locally](examples/5/)**
 
 So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
 
@@ -586,7 +586,7 @@ I am going to try to explain exactly how that works, but it is not crucial to ge
 
 ## Example 6: Pair of random GIF viewers
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/6) / [run locally](examples/6/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/6.html) / [run locally](examples/6/)**
 
 Alright, effects can be done, but what about *nested* effects? Did you think about that?! This example reuses the exact code from the GIF viewer in example 5 to create a pair of independent GIF viewers.
 
@@ -658,7 +658,7 @@ In this case we not only use `Effects.map` to tag results appropriately, we also
 
 ## Example 7: List of random GIF viewers
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/7) / [run locally](examples/7/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/7.html) / [run locally](examples/7/)**
 
 This example lets you have a list of random GIF viewers where you can create the topics yourself. Again, we reuse the core `RandomGif` module exactly as is.
 
@@ -669,7 +669,7 @@ Please open an issue if this section should go into more detail about how things
 
 ## Example 8: Animation
 
-> [demo](https://evancz.github.io/elm-architecture-tutorial/examples/8) / [run locally](examples/8/)
+**[demo](https://evancz.github.io/elm-architecture-tutorial/examples/8.html) / [run locally](examples/8/)**
 
 Now we have seen components with tasks that can be nested in arbitrary ways, but how does it work for animation?
 
