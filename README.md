@@ -453,7 +453,7 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
 
-[fx]: http://package.elm-lang.org/packages/evancz/elm-lang/latest
+[fx]: http://package.elm-lang.org/packages/evancz/elm-effects/latest
 
 As you look through [the implementation](examples/5/RandomGif.elm), notice that it is pretty much the same code as the counter in example 1. The `Model` is very typical:
 
@@ -474,7 +474,7 @@ update : Action -> Model -> (Model, Effects Action)
 
 Instead of returning just a new `Model` we also give back some effects that we would like to run. So we will be using [the `Effects` API][fx_api], which looks something like this:
 
-[fx_api]: http://package.elm-lang.org/packages/evancz/elm-lang/latest/Effects
+[fx_api]: http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects
 
 ```elm
 module Effects where
