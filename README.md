@@ -675,7 +675,7 @@ Now we have seen components with tasks that can be nested in arbitrary ways, but
 
 Interestingly, it is pretty much exactly the same! (Or perhaps it is no longer surprising that the same pattern as in all the other examples works here too... Seems like a pretty good pattern!)
 
-This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation lives in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
+This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
 
 So all the new and interesting stuff is happening [in `SpinSquare`](examples/8/SpinSquare.elm), so we are going to focus on that code. The first thing we need is a model:
 
@@ -747,7 +747,7 @@ update msg model =
 There are two kinds of `Action` we need to handle:
 
   - `Spin` indicates that a user clicked the shape, requesting a spin. So in the `update` function, we request a clock tick if there is no animation going and just let things stay as is if one is already going.
-  - `Tick` indicates that we have gotten a clock tick so we need to take an animation step. In the `update` function this means we need to update our `animationState`. So first we check if there is an animation in progress. If so, we just figure out what the `newCount` is by taking the current `count` and adding a time diff to it. If the count is greater than 1000 we stop animating and stop requesting new clock ticks. Otherwise we update the animation state and request another clock tick.
+  - `Tick` indicates that we have gotten a clock tick so we need to take an animation step. In the `update` function this means we need to update our `animationState`. So first we check if there is an animation in progress. If so, we just figure out what the `newElapsedTime` is by taking the current `elapsedTime` and adding a time diff to it. If the now elapsed time is greater than `duration` we stop animating and stop requesting new clock ticks. Otherwise we update the animation state and request another clock tick.
 
 Again, I think we can cut this code down as we write more code like this and start seeing the general pattern. Should be exciting to find!
 
