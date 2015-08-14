@@ -36,6 +36,8 @@ The logic of every Elm program will break up into three cleanly separated parts:
 
 You can pretty reliably start with the following skeleton and then iteratively fill in details for your particular case.
 
+> If you are new to reading Elm code, check out the [language docs](http://elm-lang.org/docs) which covers everything from syntax to getting into a “functional mindset”. The first two sections of [the complete guide](http://elm-lang.org/docs#complete-guide) will get you up to speed!
+
 ```elm
 -- MODEL
 
