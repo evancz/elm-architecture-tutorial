@@ -71,9 +71,11 @@ imgStyle url =
     [ "display" => "inline-block"
     , "width" => "200px"
     , "height" => "200px"
-    , "background-position" => "center center"
+    , "background" => ("url('" ++ url ++ "') no-repeat center center")
+    , "-webkit-background-size" => "cover"
+    , "-moz-background-size" => "cover"
+    , "-o-background-size" => "cover"
     , "background-size" => "cover"
-    , "background-image" => ("url('" ++ url ++ "')")
     ]
 
 
