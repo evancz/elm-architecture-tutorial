@@ -550,7 +550,7 @@ getRandomGif : String -> Effects Action
 getRandomGif topic =
   Http.get decodeImageUrl (randomUrl topic)
     |> Task.toMaybe
-    |> Task.map NewImage
+    |> Task.map NewGif
     |> Effects.task
 
 -- The first line there created an HTTP GET request. It tries to
@@ -558,7 +558,7 @@ getRandomGif topic =
 -- with `decodeImage`. Both are defined below!
 --
 -- Next we use `Task.toMaybe` to capture any potential failures and
--- apply the `NewImage` tag to turn the result into a `Action`.
+-- apply the `NewGif` tag to turn the result into a `Action`.
 -- Finally we turn it into an `Effects` value that can be used in our
 -- `init` or `update` functions.
 
