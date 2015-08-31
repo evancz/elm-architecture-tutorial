@@ -19,7 +19,7 @@ The Elm Architecture is a simple pattern for infinitely nestable components. It 
   7. [List of GIF fetchers](http://evancz.github.io/elm-architecture-tutorial/examples/7.html)
   8. [Pair of animating squares](http://evancz.github.io/elm-architecture-tutorial/examples/8.html)
 
-This tutorial will really help! It it will bring out the concepts and ideas necessary to get to make examples 7 and 8 super easy. Investing in the foundation will be worth it!
+This tutorial will really help! It will bring out the concepts and ideas necessary to get to make examples 7 and 8 super easy. Investing in the foundation will be worth it!
 
 One very interesting aspect of the architecture in all these programs is that it *emerges* from Elm naturally. The language design itself leads you towards this architecture whether you have read this document and know the benefits or not. I actually discovered this pattern just using Elm and have been shocked by its simplicity and power.
 
