@@ -64,6 +64,12 @@ view =
 
 This tutorial is all about this pattern and small variations and extensions.
 
+For every example you can view the resulting web page by going to the example directory,
+e.g. `examples/1/`, and running `elm-reactor -a 127.0.0.1 -p 8080`. This will start
+a server that is listening on 127.0.0.1:8080. Use your browser to look at
+`http://127.0.0.1:8080/Main.elm` or `http://127.0.0.1:8080/Main.elm?debug` to view
+the result of each example.
+
 
 ## Example 1: A Counter
 
@@ -128,7 +134,7 @@ main =
   start { model = 0, update = update, view = view }
 ```
 
-We are use the [`StartApp`](https://github.com/evancz/start-app) package to wire together our initial model with the update and view functions. It is a small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm) so that you do not need to dive into that concept yet.
+We are using the [`StartApp`](https://github.com/evancz/start-app) package to wire together our initial model with the update and view functions. It is a small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm) so that you do not need to dive into that concept yet.
 
 The key to wiring up your application is the concept of an `Address`. Every event handler in our `view` function reports to a particular address. It just sends chunks of data along. The `StartApp` package monitors all the messages coming in to this address and feeds them into the `update` function. The model gets updated and [elm-html][] takes care of rendering the changes efficiently.
 
