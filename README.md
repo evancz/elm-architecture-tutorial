@@ -555,7 +555,7 @@ getRandomGif topic =
 
 -- The first line there created an HTTP GET request. It tries to
 -- get some JSON at `randomUrl topic` and decodes the result
--- with `decodeImage`. Both are defined below!
+-- with `decodeImageUrl`. Both are defined below!
 --
 -- Next we use `Task.toMaybe` to capture any potential failures and
 -- apply the `NewGif` tag to turn the result into a `Action`.
