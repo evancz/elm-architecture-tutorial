@@ -44,7 +44,7 @@ update action model =
           }
 
     Remove ->
-      { model | counters <- List.drop 1 model.counters }
+      { model | counters <- (List.reverse (List.drop 1 (List.reverse model.counters))) }
 
     Modify id counterAction ->
       let updateCounter (counterID, counterModel) =
