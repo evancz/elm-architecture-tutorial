@@ -37,7 +37,7 @@ update : Action -> Model -> (Model, Effects Action)
 update message model =
     case message of
         Topic topic ->
-            ( { model | topic <- topic }
+            ( { model | topic = topic }
             , Effects.none
             )
 
@@ -71,7 +71,7 @@ update message model =
                         |> List.map subUpdate
                         |> List.unzip
             in
-                ( { model | gifList <- newGifList }
+                ( { model | gifList = newGifList }
                 , batch fxList
                 )
 
@@ -122,4 +122,8 @@ onEnter address value =
 
 is13 : Int -> Result String ()
 is13 code =
-    if code == 13 then Ok () else Err "not the right key code"
+    if code == 13 then
+        Ok ()
+
+    else
+        Err "not the right key code"
