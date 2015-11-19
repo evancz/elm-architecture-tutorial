@@ -36,22 +36,23 @@ update action model =
   case action of
     Insert ->
       { model |
-          counters <- ( model.nextID, Counter.init 0 ) :: model.counters,
-          nextID <- model.nextID + 1
+          counters = ( model.nextID, Counter.init 0 ) :: model.counters,
+          nextID = model.nextID + 1
       }
 
     Remove id ->
       { model |
-          counters <- List.filter (\(counterID, _) -> counterID /= id) model.counters
+          counters = List.filter (\(counterID, _) -> counterID /= id) model.counters
       }
 
     Modify id counterAction ->
       let updateCounter (counterID, counterModel) =
-            if counterID == id
-                then (counterID, Counter.update counterAction counterModel)
-                else (counterID, counterModel)
+              if counterID == id then
+                  (counterID, Counter.update counterAction counterModel)
+              else
+                (counterID, counterModel)
       in
-          { model | counters <- List.map updateCounter model.counters }
+          { model | counters = List.map updateCounter model.counters }
 
 
 -- VIEW
