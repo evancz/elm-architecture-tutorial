@@ -21,4 +21,4 @@ cd examples/6/
 elm-reactor
 ```
 
-And then open [http://localhost:8000/Main.elm?debug](http://localhost:8000/Main.elm?debug) to see it in action!
+And then open [http://localhost:8000/Main.elm](http://localhost:8000/Main.elm) to see it in action!
