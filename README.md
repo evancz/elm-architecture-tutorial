@@ -201,12 +201,12 @@ update action model =
 
     Top act ->
       { model |
-          topCounter <- Counter.update act model.topCounter
+          topCounter = Counter.update act model.topCounter
       }
 
     Bottom act ->
       { model |
-          bottomCounter <- Counter.update act model.bottomCounter
+          bottomCounter = Counter.update act model.bottomCounter
       }
 ```
 
@@ -275,12 +275,12 @@ update action model =
           newCounters = model.counters ++ [ newCounter ]
       in
           { model |
-              counters <- newCounters,
-              nextID <- model.nextID + 1
+              counters = newCounters,
+              nextID = model.nextID + 1
           }
 
     Remove ->
-      { model | counters <- List.drop 1 model.counters }
+      { model | counters = List.drop 1 model.counters }
 
     Modify id counterAction ->
       let updateCounter (counterID, counterModel) =
@@ -288,7 +288,7 @@ update action model =
                 then (counterID, Counter.update counterAction counterModel)
                 else (counterID, counterModel)
       in
-          { model | counters <- List.map updateCounter model.counters }
+          { model | counters = List.map updateCounter model.counters }
 ```
 
 Here is a high-level description of each case:
@@ -387,13 +387,13 @@ update action model =
   case action of
     Insert ->
       { model |
-          counters <- ( model.nextID, Counter.init 0 ) :: model.counters,
-          nextID <- model.nextID + 1
+          counters = ( model.nextID, Counter.init 0 ) :: model.counters,
+          nextID = model.nextID + 1
       }
 
     Remove id ->
       { model |
-          counters <- List.filter (\(counterID, _) -> counterID /= id) model.counters
+          counters = List.filter (\(counterID, _) -> counterID /= id) model.counters
       }
 
     Modify id counterAction ->
@@ -402,7 +402,7 @@ update action model =
                 then (counterID, Counter.update counterAction counterModel)
                 else (counterID, counterModel)
       in
-          { model | counters <- List.map updateCounter model.counters }
+          { model | counters = List.map updateCounter model.counters }
 ```
 
 In the case of `Remove`, we take out the counter that has the ID we are supposed to remove. Otherwise, the cases are quite close to how they were before.
