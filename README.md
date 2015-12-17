@@ -71,15 +71,29 @@ This tutorial is all about this pattern and small variations and extensions.
 
 Our first example is a simple counter that can be incremented or decremented.
 
-[The code](examples/1/Counter.elm) starts with a very simple model. We just need to keep track of a single number:
+[The code](examples/1/Counter.elm) starts with a very simple model. Create a file and call it Counter.elm. We just need to keep track of a single number:
 
 ```elm
+--- Counter.elm
 type alias Model = Int
 ```
 
-When it comes to updating our model, things are relatively simple again. We define a set of actions that can be performed, and an `update` function to actually perform those actions:
+Next, lets bring in [elm-html][] we will need this later to allow HTML to show in your browser, it is best to get it imported now so you can focus on learning the Elm language.
 
 ```elm
+--- Counter.elm
+import Html exposing (..)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
+
+type alias Model = Int
+...
+```
+
+Now when it comes to updating our model, things are relatively simple again. We define a set of actions that can be performed, and an `update` function to actually perform those actions:
+
+```elm
+--- Counter.elm
 type Action = Increment | Decrement
 
 update : Action -> Model -> Model
@@ -93,11 +107,12 @@ Notice that our `Action` [union type][] does not *do* anything. It simply descri
 
 [union type]: http://elm-lang.org/learn/Union-Types.elm
 
-Finally, we create a way to `view` our `Model`. We are using [elm-html][] to create some HTML to show in a browser. We will create a div that contains: a decrement button, a div showing the current count, and an increment button.
+Finally, we create a way to `view` our `Model`. We are using [elm-html][] here to create some HTML to show in a browser. We will create a div that contains: a decrement button, a div showing the current count, and an increment button.
 
 [elm-html]: http://elm-lang.org/blog/Blazing-Fast-Html.elm
 
 ```elm
+--- Counter.elm
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
@@ -108,7 +123,13 @@ view address model =
 
 countStyle : Attribute
 countStyle =
-  ...
+  style
+    [ ("font-size", "20px")
+    , ("font-family", "monospace")
+    , ("display", "inline-block")
+    , ("width", "50px")
+    , ("text-align", "center")
+    ]
 ```
 
 The tricky thing about our `view` function is the `Address`. We will dive into that in the next section! For now, I just want you to notice that **this code is entirely declarative**. We take in a `Model` and produce some `Html`. That is it. At no point do we mutate the DOM manually, which gives the library [much more freedom to make clever optimizations][elm-html] and actually makes rendering *faster* overall. It is crazy. Furthermore, `view` is a plain old function so we can get the full power of Elm&rsquo;s module system, test frameworks, and libraries when creating views.
@@ -118,9 +139,10 @@ This pattern is the essence of architecting Elm programs. Every example we see f
 
 ## Starting the Program
 
-Pretty much all Elm programs will have a small bit of code that drives the whole application. For each example in this tutorial, that code is broken out into `Main.elm`. For our counter example, the interesting code looks like this:
+Pretty much all Elm programs will have a small bit of code that drives the whole application. For each example in this tutorial, that code is broken out into `Main.elm` so lets make that file now. For our counter example, the interesting code looks like this:
 
 ```elm
+--- Main.elm
 import Counter exposing (update, view)
 import StartApp.Simple exposing (start)
 
@@ -453,7 +475,7 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/5.html) / [run locally](examples/5/)**
 
-So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
+So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”.
 
 [fx]: http://package.elm-lang.org/packages/evancz/elm-effects/latest
 
@@ -573,7 +595,7 @@ randomUrl topic =
 
 
 -- A JSON decoder that takes a big chunk of JSON spit out by
--- giphy and extracts the string at `json.data.image_url` 
+-- giphy and extracts the string at `json.data.image_url`
 decodeImageUrl : Json.Decoder String
 decodeImageUrl =
   Json.at ["data", "image_url"] Json.string
@@ -677,7 +699,7 @@ Now we have seen components with tasks that can be nested in arbitrary ways, but
 
 Interestingly, it is pretty much exactly the same! (Or perhaps it is no longer surprising that the same pattern as in all the other examples works here too... Seems like a pretty good pattern!)
 
-This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
+This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`.
 
 So all the new and interesting stuff is happening [in `SpinSquare`](examples/8/SpinSquare.elm), so we are going to focus on that code. The first thing we need is a model:
 
@@ -697,7 +719,7 @@ duration = second
 ```
 
 So our core model is the `angle` that the square is currently at and then some `animationState` to track what is going on with any ongoing animation. If there is no animation it is `Nothing`, but if something is happening it holds:
-  
+
   * `prevClockTime` &mdash; The most recent clock time which we will use for calculating time diffs. It will help us know exactly how many milliseconds have passed since last frame.
   * `elapsedTime` &mdash; A number between 0 and `duration` that tells us how far we are in the animation.
 
