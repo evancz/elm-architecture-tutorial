@@ -1,6 +1,6 @@
 ## Preview
 
-Click [here](https://evancz.github.io/elm-architecture-tutorial/examples/2) to see it running.
+Click [here](http://evancz.github.io/elm-architecture-tutorial/examples/2) to see it running.
 
 
 ## Run Locally
