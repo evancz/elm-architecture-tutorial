@@ -562,6 +562,10 @@ getRandomGif topic =
 -- Finally we turn it into an `Effects` value that can be used in our
 -- `init` or `update` functions.
 
+-- By the way we are adding sugar syntax here. 
+-- Instead of `[("tag", topic)]` we can use `["tag" => topic]`.
+
+(=>) = (,)
 
 -- Given a topic, construct a URL for the giphy API.
 randomUrl : String -> String
