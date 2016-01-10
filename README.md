@@ -585,6 +585,14 @@ One of the interesting things about the task returned by `getRandomGif` is that 
 
 I am going to try to explain exactly how that works, but it is not crucial to get every piece of this to use things! Okay, so every `Task` has a failure type and a success type. For example, an HTTP task may have a type like this `Task Http.Error String` such that we can fail with an `Http.Error` or succeed with a `String`. This makes it nice to chain a bunch of tasks together without worrying too much about errors. Now lets say our component requests a task, but the task fails. What happens then? Who gets notified? How do we recover? By making the failure type `Never` we force any potential errors into the success type such that they can be handled explicitly by the component. In our case, we use `Task.toMaybe : Task x a -> Task y (Maybe a)` so our `update` function must explicitly handle HTTP failures. This means tasks cannot silently fail, you always handle potential errors explicitly.
 
+To get Elm to actually perform the task we have to hand it to a port when starting the app:
+
+```elm 
+port tasks : Signal (Task.Task Never ())
+port tasks =
+  app.tasks
+```
+
 
 ## Example 6: Pair of random GIF viewers
 
