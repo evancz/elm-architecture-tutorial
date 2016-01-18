@@ -64,6 +64,12 @@ view =
 
 This tutorial is all about this pattern and small variations and extensions.
 
+For every example you can view the resulting web page by going to the example directory,
+e.g. `examples/1/`, and running `elm-reactor -a 127.0.0.1 -p 8080`. This will start
+a server that is listening on 127.0.0.1:8080. Use your browser to look at
+`http://127.0.0.1:8080/Main.elm` or `http://127.0.0.1:8080/Main.elm?debug` to view
+the result of each example.
+
 
 ## Example 1: A Counter
 
