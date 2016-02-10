@@ -1,6 +1,6 @@
 ## Preview
 
-Click [here](https://evancz.github.io/elm-architecture-tutorial/examples/2) to see it running.
+Click [here](http://evancz.github.io/elm-architecture-tutorial/examples/2) to see it running.
 
 
 ## Run Locally
@@ -21,4 +21,4 @@ cd examples/2/
 elm-reactor
 ```
 
-And then open [http://localhost:8000/Main.elm?debug](http://localhost:8000/Main.elm?debug) to see it in action!
+And then open [http://localhost:8000/Main.elm](http://localhost:8000/Main.elm) to see it in action!

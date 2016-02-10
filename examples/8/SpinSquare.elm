@@ -18,7 +18,7 @@ type alias Model =
 
 
 type alias AnimationState =
-    Maybe { prevClockTime : Time,  elapsedTime: Time }
+    Maybe { prevClockTime : Time, elapsedTime : Time }
 
 
 init : (Model, Effects Action)
