@@ -89,7 +89,7 @@ getRandomGif topic =
 
 randomUrl : String -> String
 randomUrl topic =
-  Http.url "http://api.giphy.com/v1/gifs/random"
+  Http.url "https://api.giphy.com/v1/gifs/random"
     [ "api_key" => "dc6zaTOxFJmzC"
     , "tag" => topic
     ]
