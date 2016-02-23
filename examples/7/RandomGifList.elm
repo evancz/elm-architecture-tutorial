@@ -13,9 +13,11 @@ import RandomGif
 
 type alias Model =
     { topic : String
-    , gifList : List (Int, RandomGif.Model)
-    , uid : Int
+    , randomGifs : List (ID, RandomGif.Model)
+    , nextID : ID
     }
+
+type alias ID = Int
 
 
 init : (Model, Effects Action)
@@ -29,8 +31,8 @@ init =
 
 type Action
     = Topic String
-    | Create
-    | SubMsg Int RandomGif.Action
+    | Insert
+    | Modify ID RandomGif.Action
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -41,39 +43,59 @@ update message model =
             , Effects.none
             )
 
-        Create ->
+        Insert ->
             let
-                (newRandomGif, fx) =
+                (newRandomGif, newRandomGifEffects) =
                     RandomGif.init model.topic
 
-                newModel =
-                    Model "" (model.gifList ++ [(model.uid, newRandomGif)]) (model.uid + 1)
-            in
-                ( newModel
-                , map (SubMsg model.uid) fx
-                )
+                newRandomGifEntry =
+                  (model.nextID, newRandomGif)
 
-        SubMsg msgId msg ->
+                newRandomGifs =
+                  model.randomGifs ++ [newRandomGifEntry]
+
+                newModel =
+                    Model "" newRandomGifs (model.nextID + 1)
+
+                newEffects =
+                  Effects.map (Modify model.nextID) newRandomGifEffects
+            in
+                (newModel, newEffects)
+
+        Modify id randomGifAction ->
             let
-                subUpdate ((id, randomGif) as entry) =
-                    if id == msgId then
-                        let
-                            (newRandomGif, fx) = RandomGif.update msg randomGif
-                        in
-                            ( (id, newRandomGif)
-                            , map (SubMsg id) fx
-                            )
+                updateRandomGif randomGif =
+                  RandomGif.update randomGifAction randomGif
+
+                newRandomGifEntry randomGifID randomGif =
+                  let
+                      (newRandomGif, newRandomGifEffects) =
+                        updateRandomGif randomGif
+
+                      newEntryEffects =
+                        Effects.map (Modify randomGifID) newRandomGifEffects
+                  in
+                      ((randomGifID, newRandomGif), newEntryEffects)
+
+                updateRandomGifEntry ((randomGifID, randomGif) as entry) =
+                    if randomGifID == id then
+                        newRandomGifEntry randomGifID randomGif
                     else
                         (entry, Effects.none)
 
-                (newGifList, fxList) =
-                    model.gifList
-                        |> List.map subUpdate
+                (newRandomGifs, newEffectsList) =
+                    model.randomGifs
+                        |> List.map updateRandomGifEntry
                         |> List.unzip
+
+                newModel =
+                  { model |
+                    randomGifs = newRandomGifs }
+
+                newEffects =
+                  Effects.batch newEffectsList
             in
-                ( { model | gifList = newGifList }
-                , batch fxList
-                )
+              (newModel, newEffects)
 
 
 -- VIEW
@@ -87,19 +109,19 @@ view address model =
         [ input
             [ placeholder "What kind of gifs do you want?"
             , value model.topic
-            , onEnter address Create
+            , onEnter address Insert
             , on "input" targetValue (Signal.message address << Topic)
             , inputStyle
             ]
             []
         , div [ style [ "display" => "flex", "flex-wrap" => "wrap" ] ]
-            (List.map (elementView address) model.gifList)
+            (List.map (elementView address) model.randomGifs)
         ]
 
 
 elementView : Signal.Address Action -> (Int, RandomGif.Model) -> Html
 elementView address (id, model) =
-    RandomGif.view (Signal.forwardTo address (SubMsg id)) model
+    RandomGif.view (Signal.forwardTo address (Modify id)) model
 
 
 inputStyle : Attribute
