@@ -437,7 +437,7 @@ viewCounter address (id, model) =
 
 ```elm
 update : Context -> Action -> Model -> Model
-view : Context' -> Model -> Html
+view : Context -> Model -> Html
 ```
 
 ネストの全ての階層でそれぞれのサブモジュールのための特別な `Context` を作り出す事ができる。

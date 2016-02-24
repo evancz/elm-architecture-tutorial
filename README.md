@@ -439,7 +439,7 @@ In our `viewCounter` function, we construct the `Counter.Context` to pass in all
 
 ```elm
 update : Context -> Action -> Model -> Model
-view : Context' -> Model -> Html
+view : Context -> Model -> Html
 ```
 
 At every level of nesting we can derive the specific `Context` needed for each submodule.
