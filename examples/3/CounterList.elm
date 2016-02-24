@@ -35,25 +35,45 @@ update : Action -> Model -> Model
 update action model =
   case action of
     Insert ->
-      let newCounter = ( model.nextID, Counter.init 0 )
-          newCounters = model.counters ++ [ newCounter ]
+      let
+        newCounter =
+          Counter.init 0
+
+        newCounterEntry =
+          ( model.nextID, newCounter )
+
+        newCounters =
+          model.counters ++ [newCounterEntry]
+
+        newModel =
+          Model newCounters (model.nextID + 1)
       in
-          { model |
-              counters = newCounters,
-              nextID = model.nextID + 1
-          }
+        newModel
 
     Remove ->
       { model | counters = List.drop 1 model.counters }
 
     Modify id counterAction ->
-      let updateCounter (counterID, counterModel) =
-              if counterID == id then
-                  (counterID, Counter.update counterAction counterModel)
-              else
-                  (counterID, counterModel)
+      let
+        updateCounter counter =
+          Counter.update counterAction counter
+
+        newCounterEntry counterID counter =
+          ( counterID, updateCounter counter )
+
+        updateCounterEntry ((counterID, counter) as entry) =
+          if counterID == id then
+            newCounterEntry counterID counter
+          else
+            entry
+
+        newCounters =
+          List.map updateCounterEntry model.counters
+
+        newModel =
+            { model | counters = newCounters }
       in
-          { model | counters = List.map updateCounter model.counters }
+        newModel
 
 
 -- VIEW
