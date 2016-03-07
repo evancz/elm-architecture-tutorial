@@ -58,7 +58,7 @@ update action model =
 -- VIEW
 
 view : Model -> Html
-view =
+view model =
   ...
 ```
 
