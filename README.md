@@ -558,7 +558,7 @@ getRandomGif topic =
 -- with `decodeImageUrl`. Both are defined below!
 --
 -- Next we use `Task.toMaybe` to capture any potential failures and
--- apply the `NewGif` tag to turn the result into a `Action`.
+-- apply the `NewGif` tag to turn the result into an `Action`.
 -- Finally we turn it into an `Effects` value that can be used in our
 -- `init` or `update` functions.
 
