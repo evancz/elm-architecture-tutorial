@@ -147,9 +147,9 @@ main =
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/2.html) / [see code](examples/2/)**
 
-In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular?
+在上一个例子里我们创造了一个计数器，但是当增加到两个计数器时这个模式会怎样变化呢？我们能继续保持模块化吗？
 
-Wouldn't it be great if we could reuse all the code from example 1? The crazy thing about the Elm Architecture is that **we can reuse code with absolutely no changes**. When we created the `Counter` module in example one, it encapsulated all the implementation details so we can use them elsewhere:
+如果我们能完全重用例子一的代码就再好不过了。Elm 架构最疯狂的是 **我们可以一句不改地重用代码**。当我们创造例子一的计 `Counter` 模块时，它包括了所有实现细节所已我们可以在任何地方使用它。
 
 ```elm
 module Counter (Model, init, Action, update, view) where
@@ -165,9 +165,9 @@ update : Action -> Model -> Model
 view : Signal.Address Action -> Model -> Html
 ```
 
-Creating modular code is all about creating strong abstractions. We want boundaries which appropriately expose functionality and hide implementation. From outside of the `Counter` module, we just see a basic set of values: `Model`, `init`, `Action`, `update`, and `view`. We do not care at all how these things are implemented. In fact, it is *impossible* to know how these things are implemented. This means no one can rely on implementation details that were not made public.
+编写模块代码其实完全是在创建一种很强的抽象。我们期待的是合适的函数暴露和隐藏具体执行过程。从 `Counter` 模块的外部我们只能看到一些基础的值: `Model`, `init`, `Action`, `update`, 和 `view`。我们完全不用关心这些是如何实现的。事实上，也不可能知道这些是如何实现的。这意味着没人能以赖这些不公开的实现细节。
 
-So we can reuse our `Counter` module, but now we need to use it to create our `CounterPair`. As always, we start with a `Model`:
+所以我们本可以完全复制 `Counter` 模块, 但是我们还是使用它来实现 `CounterPair`。 像往常一样, 我们从一个 `Model` 开始:
 
 ```elm
 type alias Model =
@@ -182,9 +182,9 @@ init top bottom =
     }
 ```
 
-Our `Model` is a record with two fields, one for each of the counters we would like to show on screen. This fully describes all of the application state. We also have an `init` function to create a new `Model` whenever we want.
+我们的 `Model` 纪录了两个计数器, 一个是需要在屏幕上显示的。这个完全描述了应用所有的状态。我们还有一个 `init` 函数可以在任何地方创建一个新的 `Model`。
 
-Next we describe the set of `Actions` we would like to support. This time our features should be: reset all counters, update the top counter, or update the bottom counter.
+下一步我们来描述下我们想要支持的 `Actions`。我们需要的功能是: 重置所有的计数器, 更新顶部的计数器，或者更新下面的计数器。
 
 ```elm
 type Action
@@ -193,7 +193,7 @@ type Action
     | Bottom Counter.Action
 ```
 
-Notice that our [union type][] refers to the `Counter.Action` type, but we do not know the particulars of those actions. When we create our `update` function, we are mainly routing these `Counter.Actions` to the right place:
+请注意，我们的 [union type][] 是参考 `Counter.Action` 类型，但是我们并知道那些 `action` 的细节。当我们创建 `update` 函数时，我们主要是路由这些 `Counter.Actions` 到正确的地方:
 
 ```elm
 update : Action -> Model -> Model
@@ -212,7 +212,7 @@ update action model =
       }
 ```
 
-So now the final thing to do is create a `view` function that shows both of our counters on screen along with a reset button.
+所以最后要做的事情就是创建一个 `view` 函数显示两个计数器和两个重置按钮。
 
 ```elm
 view : Signal.Address Action -> Model -> Html
@@ -223,25 +223,24 @@ view address model =
     , button [ onClick address Reset ] [ text "RESET" ]
     ]
 ```
+请注意，我们可以重用 `Counter.view` 函数在两个计数器之中。我们为每个计数器创建一个转发地址。大体上，我们这里做的事情其实是说：&ldquo;这些计数器将会给所有向外传递的消息打上 `Top` 或 `Bottom` 标签，以便我们区分&rdquo;
 
-Notice that we are able to reuse the `Counter.view` function for both of our counters. For each counter we create a forwarding address. Essentially what we are doing here is saying, &ldquo;these counters will tag all outgoing messages with `Top` or `Bottom` so we can tell the difference.&rdquo;
-
-That is the whole thing. The cool thing is that we can keep nesting more and more. We can take the `CounterPair` module, expose the key values and functions, and create a `CounterPairPair` or whatever it is we need.
+这就是所有的事情。最屌的是我们可以一层又一层地保持嵌套。我们可以创建 `CounterPair` 模块，暴露关键值和方法，然后创建 `CounterPairPair` 或者任何其他我们需要的。
 
 
 ## Example 3: A Dynamic List of Counters
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/3.html) / [see code](examples/3/)**
 
-A pair of counters is cool, but what about a list of counters where we can add and remove counters as we see fit? Can this pattern work for that too?
+两个计数器已经很屌了，但一个可以随意添加和删除的计数器队列会怎么样呢？这种模式还有效吗？
 
-Again we can reuse the `Counter` module exactly as it was in example 1 and 2!
+而且我们可以完全像例子一盒例子二里那样复用 `Counter` !
 
 ```elm
 module Counter (Model, init, Action, update, view)
 ```
 
-That means we can just get started on our `CounterList` module. As always, we begin with our `Model`:
+这意味着我们可以开始创建 `CounterList` 模块。 像往常一样, 我们从 `Model` 开始:
 
 ```elm
 type alias Model =
@@ -252,12 +251,13 @@ type alias Model =
 type alias ID = Int
 ```
 
-Now our model has a list of counters, each annotated with a unique ID. These IDs allow us to distinguish between them, so if we need to update counter number 4 we have a nice way to refer to it. (This ID also gives us something convenient to [`key`][key] on when we are thinking about optimizing rendering, but that is not the focus of this tutorial!) Our model also contains a
-`nextID` which helps us assign unique IDs to each counter as we add new ones.
+现在，我们的 `model` 有了一个计数器队列，每个计数器有一个唯一的 ID。这些 ID 使我们可以区别它们，所以如果我们要更新 4 号计数器，我们可以很轻松的找到它。（当我们考虑优化渲染时，这个 ID 也给了我们一些 [`key`][key] 的便利，然而它并不是这个教程的重点！）我们的 `modal` 还包含一个 `nextID` 帮助我们指定 ID 给每一个新增的计数器。
 
 [key]: http://package.elm-lang.org/packages/evancz/elm-html/latest/Html-Attributes#key
 
-Now we can define the set of `Actions` that can be performed on our model. We want to be able to add counters, remove counters, and update certain counters.
+
+Now we can define the set of `Actions` that can be performed on our model. We
+want to be able to add counters, remove counters, and update certain counters.
 
 ```elm
 type Action
