@@ -255,9 +255,7 @@ type alias ID = Int
 
 [key]: http://package.elm-lang.org/packages/evancz/elm-html/latest/Html-Attributes#key
 
-
-Now we can define the set of `Actions` that can be performed on our model. We
-want to be able to add counters, remove counters, and update certain counters.
+现在我们可以定义一组 `Action` 来操作 `model`。我们希望可以添加计数器，删除计数器，以及更新特定的计数器。
 
 ```elm
 type Action
@@ -266,7 +264,7 @@ type Action
     | Modify ID Counter.Action
 ```
 
-Our `Action` [union type][] is shockingly close to the high-level description. Now we can define our `update` function.
+我们的 `Action` [union type][] 令人震惊的接近高阶描述。下面我们可以定义 `update` 函数了。
 
 ```elm
 update : Action -> Model -> Model
@@ -293,18 +291,15 @@ update action model =
           { model | counters = List.map updateCounter model.counters }
 ```
 
-Here is a high-level description of each case:
+这里有对每种情况的高阶描述：
 
-  * `Insert` &mdash; First we create a new counter and put it at the end of
-    our counter list. Then we increment our `nextID` so that we have a fresh
-    ID next time around.
+  * `Insert` &mdash; 首先我们创造一个新的计数器，并把它当在计数器队列的最后。然后我们给 `nextID` 加一，以便下一次添加时有一个新的ID。 
 
-  * `Remove` &mdash; Drop the first member of our counter list.
+  * `Remove` &mdash; 删除计数器列表的第一个成员。
 
-  * `Modify` &mdash; Run through all of our counters. If we find one with
-    a matching ID, we perform the given `Action` on that counter.
+  * `Modify` &mdash; 遍历所有计数器，当找到匹配的 ID 时，用所给的 `Action` 操作这个计数器。
 
-All that is left to do now is to define the `view`.
+下面唯一要做的就是定义 `view`。
 
 ```elm
 view : Signal.Address Action -> Model -> Html
@@ -320,23 +315,22 @@ viewCounter address (id, model) =
   Counter.view (Signal.forwardTo address (Modify id)) model
 ```
 
-The fun part here is the `viewCounter` function. It uses the same old
-`Counter.view` function, but in this case we provide a forwarding address that annotates all messages with the ID of the particular counter that is getting rendered.
+这里的 `viewCounter` 函数比较有趣。它必须使用同一个 `Counter.view` 函数，但在这里我们提供了一个转发地址来标记所有的消息和正在渲染的计数器的 ID。
 
-When we create the actual `view` function, we map `viewCounter` over all of our counters and create add and remove buttons that report to the `address` directly.
+实际上，当我们创建 `view` 函数时，我们映射 `viewCounter` 到所有的计数器，然后创建添加和删除按钮直接返回 `address`。
 
-This ID trick can be used any time you want a dynamic number of subcomponents. Counters are very simple, but the pattern would work exactly the same if you had a list of user profiles or tweets or newsfeed items or product details.
+这个 ID 的玩法可以用在任何你需要数目可变的子模块时。计数器是简单的，但是这种模式可以完全不变的在用户信息，tweets，新闻列表或者产品列表上复用。
 
 
 ## Example 4: A Fancier List of Counters
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/4.html) / [see code](examples/4/)**
 
-Okay, keeping things simple and modular on a dynamic list of counters is pretty cool, but instead of a general remove button, what if each counter had its own specific remove button? Surely *that* will mess things up!
+OK，在一个动态的计数器列表上保持简单和模块化是很屌的，但是如果不要一个通用的删除按钮，而是每个计数器有一个单独的删除按钮呢？它会把事情搞糟吗？
 
-Nah, it works.
+不, 它仍然有效.
 
-In this case our goals mean that we need a new way to view a `Counter` that adds a remove button. Interestingly, we can keep the `view` function from before and add a new `viewWithRemoveButton` function that provides a slightly different view of our underlying `Model`. This is pretty cool. We do not need to duplicate any code or do any crazy subtyping or overloading. We just add a new function to the public API to expose new functionality!
+在这里，我们的目标是找到一种新的方法给每个计数器添加一个删除按钮。有趣的是，我们可以继续使用原有的 `view` 函数并添加一个新的 `viewWithRemoveButton` 函数，这个函数为我们依赖的 `Model` 提供一个微小的变化。屌屌屌，我们不用重复任何代码更不用做任何疯狂的继承和重载。我们只是给公开的 API 添加了一个函数暴露新的功能！
 
 ```elm
 module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context) where
@@ -359,9 +353,10 @@ viewWithRemoveButton context model =
     ]
 ```
 
-The `viewWithRemoveButton` function adds one extra button. Notice that the increment/decrement buttons send messages to the `actions` address but the delete button sends messages to the `remove` address. The messages we send along to `remove` are essentially saying, &ldquo;hey, whoever owns me, remove me!&rdquo; It is up to whoever owns this particular counter to do the removing.
 
-Now that we have our new `viewWithRemoveButton`, we can create a `CounterList` module which puts all the individual counters together. The `Model` is the same as in example 3: a list of counters and a unique ID.
+`viewWithRemoveButton` 函数添加了一个额外的按钮。请注意 *增加/减少* 按钮发送消息给 `actions` 地址，但是删除按钮发送消息给 `remove` 这个地址。我们发给 `remove` 的消息其实是在说：&ldquo;嘿，无论谁拥有我，请删掉我！&rdquo; 这个计数器的拥有者负责删除。
+
+既然我们有了新的 `viewWithRemoveButton`, 我们可以创建一个新的 `CounterList` 模块把所有独立的计数器放在一起。这个 `Model` 和 栗子3 中的一样: 带各自 ID 的计数器列表。
 
 ```elm
 type alias Model =
@@ -371,8 +366,7 @@ type alias Model =
 
 type alias ID = Int
 ```
-
-Our set of actions is a bit different. Instead of removing any old counter, we want to remove a specific one, so the `Remove` case now holds an ID.
+我们的 `action` 稍有不同。不是删除一个旧的计数器，而是删除特定的一个，所以 `Remove` 需要一个 ID。
 
 ```elm
 type Action
@@ -381,7 +375,7 @@ type Action
     | Modify ID Counter.Action
 ```
 
-The `update` function is pretty similar to example 3 as well.
+`update` 函数和 栗子3 中的非常像。
 
 ```elm
 update : Action -> Model -> Model
@@ -407,9 +401,9 @@ update action model =
           { model | counters = List.map updateCounter model.counters }
 ```
 
-In the case of `Remove`, we take out the counter that has the ID we are supposed to remove. Otherwise, the cases are quite close to how they were before.
+在 `Remove` 时，我们取出拥有该 ID 的计数器。否则，退出直接退出并保持原来那样。
 
-Finally, we put it all together in the `view`:
+最后，我们我们把萌宝宝们都放进 `view` 中：
 
 ```elm
 view : Signal.Address Action -> Model -> Html
@@ -428,25 +422,24 @@ viewCounter address (id, model) =
       Counter.viewWithRemoveButton context model
 ```
 
-In our `viewCounter` function, we construct the `Counter.Context` to pass in all the necessary forwarding addresses. In both cases we annotate each `Counter.Action` so that we know which counter to modify or remove.
+在 `viewCounter` 函数中, 我们构造了 `Counter.Context` 来传递所有必需的转发地址。在两种情况下分别声明 `Counter.Action` 以便我们知道哪个计数器需要修改或删除。
 
+## 目前为止获得的人生经验
 
-## Big Lessons So Far
+**基础模式** &mdash; 任何事都是围绕 `Model` 创建出来的，包括更新 `model` 的函数, 以及 `model` 的 `view`。任何事都可以看作基础模式的变体。
 
-**Basic Pattern** &mdash; Everything is built around a `Model`, a way to `update` that model, and a way to `view` that model. Everything is a variation on this basic pattern.
+**嵌套 Modules** &mdash; 转发地址使基础模式的嵌套变的简单，完全隐藏实现细节。我们可以无限深地嵌套这种模式，并且每一层只需要知道下一层在发生什么。
 
-**Nesting Modules** &mdash; Forwarding addresses makes it easy to nest our basic pattern, hiding implementation details entirely. We can nest this pattern arbitrarily deep, and each level only needs to know about what is going on one level lower.
-
-**Adding Context** &mdash; Sometimes to `update` or `view` our model, extra information is needed. We can always add some `Context` to these functions and pass in all the additional information we need without complicating our `Model`.
+**添加上下文** &mdash; 有时对 `modal` 进行 `update` 或者 `view` 操作时需要额外的信息。我们随时可以添加 `Context` 给这些函数并传递所有的附加信息而不需要改变 `Model`。
 
 ```elm
 update : Context -> Action -> Model -> Model
 view : Context' -> Model -> Html
 ```
 
-At every level of nesting we can derive the specific `Context` needed for each submodule.
+在嵌套的每一层，我们都可以为每个子模块衍生出所需的 `Context`。
 
-**Testing is Easy** &mdash; All of the functions we have created are [pure functions][pure]. That makes it extremely easy to test your `update` function. There is no special initialization or mocking or configuration step, you just call the function with the arguments you would like to test.
+**测试变的简单** &mdash; 我们创建的所有函数都是 [纯洁函数][pure]。这样测试 `update` 函数变的极其简单。不需要特别的初始化、模拟、配置步骤，你只要带着你想要测试的参数直接调用函数即可。
 
 [pure]: http://en.wikipedia.org/wiki/Pure_function
 
@@ -455,11 +448,11 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/5.html) / [see code](examples/5/)**
 
-So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
+我们已经讲了如何创建可无限嵌套的组件，但当我们在某个组件里发出一个 HTTP 请求时会发生什么呢？与数据库通信呢？这个栗子使用 [`elm-effects` 包][fx] 来创建一个简单的组件，这个组件可以从 giphy.com 获取随机的可爱喵星人的 gif。 
 
 [fx]: http://package.elm-lang.org/packages/evancz/elm-effects/latest
 
-As you look through [the implementation](examples/5/RandomGif.elm), notice that it is pretty much the same code as the counter in example 1. The `Model` is very typical:
+如果看了 [这个栗子的实现](examples/5/RandomGif.elm), 你会注意到它和 栗子1 中的代码非常接近。它的 `Model` 非常典型:
 
 ```elm
 type alias Model =
@@ -468,7 +461,7 @@ type alias Model =
     }
 ```
 
-We need to know what the `topic` of the finder is and what `gifUrl` we are showing right this second. The only new thing in this example is that `init` and `update` have slightly fancier types:
+我们需要知道要查找的 `topic` 值和当前展示的 `gifUrl`。这里唯一新颖的东西是 `init` 和 `update` 的类型:
 
 ```elm
 init : String -> (Model, Effects Action)
@@ -476,7 +469,7 @@ init : String -> (Model, Effects Action)
 update : Action -> Model -> (Model, Effects Action)
 ```
 
-Instead of returning just a new `Model` we also give back some effects that we would like to run. So we will be using [the `Effects` API][fx_api], which looks something like this:
+并非只是返回一个新的 `Model` 我们还返回一些我们需要执行的效果。所以我们将会使用 [`Effects` API][fx_api]，看起来像这样：
 
 [fx_api]: http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects
 
@@ -492,7 +485,7 @@ task : Task Never a -> Effects a
   -- request a task, do HTTP and database stuff
 ```
 
-The `Effects` type is essentially a data structure holding a bunch of independent tasks that will get run at some later point. Let’s get a better feeling of how this works by checking out how `update` works in this example:
+`Effects` 类型本质上是一个包含了一些会在之后执行的独立任务的数据类型。让我们通过分析这里的 `update` 来更深入了解下这是怎么工作的：
 
 ```elm
 type Action
@@ -516,17 +509,17 @@ update msg model =
 -- getRandomGif : String -> Effects Action
 ```
 
-So the user can trigger a `RequestMore` action by clicking the “More Please!” button, and when the server responds it will give us a `NewGif` action. We handle both these scenarios in our `update` function.
+所以用户可以通过点击 “More Please!” 按钮来触发 `RequestMore`，当服务器响应请求后它会给我们一个 `NewGif` 的 `action`。我们在 `update` 函数中处理这两种情况。
 
-In the case of `RequestMore` first return the existing model. The user just clicked a button, there is nothing to change right now. We also create an `Effects Action` using the `getRandomGif` function. We will get to how `getRandomGif` is defined soon. For now we just need to know that when an `Effects Action` is run, it will produce a bunch of `Action` values that will be routed throughout the application. So `getRandomGif model.topic` will eventually result in an action like this:
+在这里 `RequestMore` 第一次返回已经存在的 `model`。用户只是点击了一个按钮，这时并没有任何改变。我们还使用 `getRandomGif` 函数创建了一个 `Effects Action`。我们马上将会知道 `getRandomGif` 是如何定义的。到此为止，我们只需知道当一个 `Effects Action` 运行时，会有一系列 `Action` 值产生并被传递给整个应用。所以 `getRandomGif model.topic` 最终会产生像这样的一个 `action like`：
 
 ```elm
 NewGif (Just "http://s3.amazonaws.com/giphygifs/media/ka1aeBvFCSLD2/giphy.gif")
 ```
 
-It returns a `Maybe` because the request to the server may fail. That `Action` will get fed right back into our `update` function. So when we take the `NewGif` route we just update the current `gifUrl` if possible. If the request failed, we just stick with the current `model.gifUrl`.
+它返回一个 `Maybe` 因为向服务器发出的请求可能失败。那个 `Action` 将会原路返回给 `update` 函数。所以当我们执行 `NewGif` 时，我们只是更新当前的 `gifUrl`，如果他可以被更新。当请求失败后，我们只是停留在当前的 `model.gifUrl`。
 
-We see the same kind of thing happening in `init` which defines the initial model and asks for a GIF in the correct topic from giphy.com’s API.
+我们看到同样的事情发生在 `init` 函数中，它定义了初始时的 `modal` 并且通过 giphy.com 的 API 请求一个特定话题的 GIF。
 
 ```elm
 init : String -> (Model, Effects Action)
@@ -538,11 +531,11 @@ init topic =
 -- getRandomGif : String -> Effects Action
 ```
 
-Again, when the random GIF effect is complete, it will produce an `Action` that gets routed to our `update` function.
+再一次，当随机的 GIF 下载完成，它会产生一个 `Action` 发送给 `update` 函数。
 
-> **Note:** So far we have been using the `StartApp.Simple` module from [the start-app package](http://package.elm-lang.org/packages/evancz/start-app/latest), but now upgrade to the `StartApp` module. It is able to handle the complexity of more realistic web apps. It has [a slightly fancier API](http://package.elm-lang.org/packages/evancz/start-app/latest/StartApp). The crucial change is that it can handle our new `init` and `update` types.
+> **注意：** 之前我们使用的是来自 [the start-app package](http://package.elm-lang.org/packages/evancz/start-app/latest) 的 `StartApp.Simple` 模块，但是现在请升级到 `StartApp` 模块。它可以处理更实际的 web 应用中的复杂情况。它有 [更优雅的 API](http://package.elm-lang.org/packages/evancz/start-app/latest/StartApp)。更至关重要的改变是它可以处理我们新的 `init` 和 `update` 类型。
 
-One of the crucial aspects of this example is the `getRandomGif` function that actually describes how to get a random GIF. It uses [tasks][] and [the `Http` package][http], and I will try to give an overview of how these things are being used as we go. Let’s look at the definition:
+这个例子中一个至关重要的方面是 `getRandomGif` 函数，它描述了如何得到一张随机的 GIF。它使用了 [任务][] 和 [`Http`][http] 库, 我会尽力概述它是如何运做的。让我们看定义：
 
 [tasks]: http://elm-lang.org/guide/reactivity#tasks
 [http]: http://package.elm-lang.org/packages/evancz/elm-http/latest
@@ -581,20 +574,20 @@ decodeImageUrl =
   Json.at ["data", "image_url"] Json.string
 ```
 
-Once we have written this up, we are able to reuse `getRandomGif` in our `init` and `update` functions.
+一旦我们写了上面这些，我们就可以在 `init` 和 `update` 函数中复用 `getRandomGif`。
 
-One of the interesting things about the task returned by `getRandomGif` is that it can `Never` fail. The idea is that any potential failure *must* be handled explicitly. We do not want any tasks failing silently.
+有趣的是，`getRandomGif` 返回的任务是*永远*不会失败的。原因是任何可能的失败*必须*被明确的处理，我们不希望任何任务静静地失败。
 
-I am going to try to explain exactly how that works, but it is not crucial to get every piece of this to use things! Okay, so every `Task` has a failure type and a success type. For example, an HTTP task may have a type like this `Task Http.Error String` such that we can fail with an `Http.Error` or succeed with a `String`. This makes it nice to chain a bunch of tasks together without worrying too much about errors. Now lets say our component requests a task, but the task fails. What happens then? Who gets notified? How do we recover? By making the failure type `Never` we force any potential errors into the success type such that they can be handled explicitly by the component. In our case, we use `Task.toMaybe : Task x a -> Task y (Maybe a)` so our `update` function must explicitly handle HTTP failures. This means tasks cannot silently fail, you always handle potential errors explicitly.
+我试图确切地解释下它是如何实现的，虽然这对于整个项目的正常运行并不特别重要。Okay，这样每个 `Task` 有一个失败的类型和一个成功的类型。例如，一个 HTTP 任务可能有类型如：`Task Http.Error String`，我们可以在失败时返回一个 `Http.Error` 或者成功时返回一个 `String`。这样可以优雅地把一组任务串在一起而不用过多的担心出错。现在，假设我们的组件请求了一个任务，但是任务失败了。会发生什么呢？谁会被通知？如何恢复？通过设置失败类型为 `Never`，我们强制任何可能的错误变成成功类型，这样它们就可以被组件明确的处理了。在这个例子里，我们用 `Task.toMaybe : Task x a -> Task y (Maybe a)` 所以 `update` 函数精确的处理了 HTTP 失败。这意味着任务不能静默的失败，你永远精确的处理着未知的错误。
 
 
 ## Example 6: Pair of random GIF viewers
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/6.html) / [see code](examples/6/)**
 
-Alright, effects can be done, but what about *nested* effects? Did you think about that?! This example reuses the exact code from the GIF viewer in example 5 to create a pair of independent GIF viewers.
+好了，结果搞定了，但是 *嵌套* 的结果呢？你是否思考过这个问题？！这个例子完全重用栗子5中的 GIF 查看器的代码创建了两个独立的 GIF 查看器。
 
-As you look through [the implementation](examples/6/RandomGifPair.elm), notice that it is pretty much the same code as the pair of counters in example 2. The `Model` is defined as two `RandomGif.Model` values:
+你阅读 [这个实现代码](examples/6/RandomGifPair.elm) 时，会注意到它和栗子2中的两个计数器的代码几乎一样。`Model` 被定义为两个 `RandomGif.Model` 的值：
 
 ```elm
 type alias Model =
@@ -603,7 +596,7 @@ type alias Model =
     }
 ```
 
-This lets us keep track of each independently. Our actions are just routing messages to the appropriate subcomponent.
+这让我们可以独立地分别跟踪它们。我们的 `action` 只是路由消息到正确的自模块。
 
 ```elm
 type Action
@@ -611,7 +604,7 @@ type Action
     | Right RandomGif.Action
 ```
 
-The interesting thing is that we actually use the `Left` and `Right` tags a bit in our `update` and `init` functions.
+有趣的是，我们实际上使用了 `Left` and `Right` 标签在 `update` 和 `init` 函数中。
 
 ```elm
 -- Effects.map : (a -> b) -> Effects a -> Effects b
@@ -636,9 +629,9 @@ update action model =
         )
 ```
 
-So in each branch we call the `RandomGif.update` function which is returning a new model and some effects we are calling `fx`. We return an updated model like normal, but we need to do some extra work on our effects. Instead of returning them directly, we use [`Effects.map`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#map) function to turn them into the same kind of `Action`. This works very much like `Signal.forwardTo`, letting us tag the values to make it clear how they should be routed.
+所以不论在哪个分支中调用 `RandomGif.update` 函数时都会返回一个新 `model` 和一些被我们称作 `fx` 的操作。我们像往常一样返回一个更新过的 `model`，但是需要在操作上做一些额外的工作。并非直接返回它们，我们使用 [`Effects.map`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#map) 函数把他们转化为一种 `Action`。这工作很像 `Signal.forwardTo`，让我们标记这些值以便确定如何路由。
 
-The same thing happens in the `init` function. We provide a topic for each random GIF viewer and get back an initial model and some effects.
+`init` 函数也是一样。我们提供一个 `topic` 给每个随机 GIF 查看器，然后得到一个初始的 `model` 和一些 `effects`。
 
 ```elm
 init : String -> String -> (Model, Effects Action)
@@ -657,31 +650,30 @@ init leftTopic rightTopic =
 -- Effects.batch : List (Effects a) -> Effects a
 ```
 
-In this case we not only use `Effects.map` to tag results appropriately, we also use the [`Effects.batch`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#batch) function to lump them all together. All of the requested tasks will get spawned off and run independently, so the left and right effects will be in progress at the same time.
+在这里我们并非只用 `Effects.map` 来标记合适的结果，还要用 [`Effects.batch`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#batch) 函数来把他们归并到一起。所有请求的任务将会被生成并且独立运行，所以左边和右边两个 `effects` 会同时被处理。
 
 
 ## Example 7: List of random GIF viewers
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/7.html) / [see code](examples/7/)**
 
-This example lets you have a list of random GIF viewers where you can create the topics yourself. Again, we reuse the core `RandomGif` module exactly as is.
+这个例子实现了一个随机 GIF 查看器的队列，你可以自己为他设置话题。而且，我们完全重用了 `RandomGif` 模块的核心。
 
-When you look through [the implementation](examples/7/RandomGifList.elm) you will see that it exactly corresponds to example 3. We put all of our submodels in a list associated with an ID and do our operations based on those IDs. The only thing new is that we are using `Effects` in the `init` and `update` function, putting them together with `Effects.map` and `Effects.batch`.
+仔细看看 [它的代码](examples/7/RandomGifList.elm) 你会发现它和 例子3 几乎一致。我们把所有子模块放进一个关联了 ID 的列表，并依据这些 ID 来进行操作。唯一新鲜的是我们使用 `Effects` 在 `init` 和 `update` 函数中，把他们和 `Effects.map` 以及 `Effects.batch` 放在一起。
 
-Please open an issue if this section should go into more detail about how things work!
-
+如果你对它的实现细节还不够清楚，请创建一个 issue。
 
 ## Example 8: Animation
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/8.html) / [see code](examples/8/)**
 
-Now we have seen components with tasks that can be nested in arbitrary ways, but how does it work for animation?
+现在，我们已经看到了带任务的组件可以很轻松地嵌套在一起，但是用它如何实现动画呢？
 
-Interestingly, it is pretty much exactly the same! (Or perhaps it is no longer surprising that the same pattern as in all the other examples works here too... Seems like a pretty good pattern!)
+很有趣，它们完全一样！（或许你已经不再感到惊奇了，相同的模式在这里也适用，真是一个可爱的模式！）
 
-This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
+这个例子是两个可点击的方块。当你点击一个方块时，它旋转 90 度。总体上，这里的代码是对 例子2 和 例子6 的调整，我们保留了所有的动画逻辑在 `SpinSquare.elm` 里面，并且在 `SpinSquarePair.elm` 里多次复用它。 
 
-So all the new and interesting stuff is happening [in `SpinSquare`](examples/8/SpinSquare.elm), so we are going to focus on that code. The first thing we need is a model:
+所有新的和有趣的东西都发生在 [`SpinSquare`](examples/8/SpinSquare.elm) 里，所以我们来关注下这里的代码。首先我们需要一个 model：
 
 ```elm
 type alias Model =
@@ -698,14 +690,14 @@ rotateStep = 90
 duration = second
 ```
 
-So our core model is the `angle` that the square is currently at and then some `animationState` to track what is going on with any ongoing animation. If there is no animation it is `Nothing`, but if something is happening it holds:
+所以 model 的核心是方块当前的 `angle` 和一些用来记录每个动画要做什么的 `animationState`。如果没有动画就是 `Nothing`，但是如果有动作发生，它就变为:
   
-  * `prevClockTime` &mdash; The most recent clock time which we will use for calculating time diffs. It will help us know exactly how many milliseconds have passed since last frame.
-  * `elapsedTime` &mdash; A number between 0 and `duration` that tells us how far we are in the animation.
+  * `prevClockTime` &mdash; 用于计算时间差的最近时间。它帮我们精确地确定上一帧后过了多少毫秒。
+  * `elapsedTime` &mdash; 0 到 `duration` 之间的一个数字，告诉我们当前动画已经进行了多久。
 
-The `rotateStep` constant is just declaring how far it turns on each click. You can mess with that and everything should keep working.
+常量 `rotateStep` 只是声明每次点击转变多少度。你可以随意修改它，而不会影响正常运行。
 
-Now the interesting stuff all happens in `update`:
+现在，`update` 里发生了一些有趣的事:
 
 ```elm
 type Action
@@ -748,16 +740,16 @@ update msg model =
           )
 ```
 
-There are two kinds of `Action` we need to handle:
+有两种 `Action` 我们需要处理：
 
-  - `Spin` indicates that a user clicked the shape, requesting a spin. So in the `update` function, we request a clock tick if there is no animation going and just let things stay as is if one is already going.
-  - `Tick` indicates that we have gotten a clock tick so we need to take an animation step. In the `update` function this means we need to update our `animationState`. So first we check if there is an animation in progress. If so, we just figure out what the `newElapsedTime` is by taking the current `elapsedTime` and adding a time diff to it. If the now elapsed time is greater than `duration` we stop animating and stop requesting new clock ticks. Otherwise we update the animation state and request another clock tick.
+  - `Spin` 标示一个用户点击了方块，请求一次旋转。所以在 `update` 函数中，如果没有正在进行的动画，我们就请求一个时间戳，并把状态设置为一个动画正在进行。
+  - `Tick` 标示我们已经得到了一个时间戳，所以我们需要进行一次动画。在 `update` 函数中，这意味着我们需要更新 `animationState`。所以，首先，我们检查当前是否有正在进行的动画。如果有，我们只是计算出 `newElapsedTime` 的值，通过把当前的 `elapsedTime` 加上一个时间差。如果当前经过的时间大于 `duration`，我们就停止动画并请求一个新的时间戳。否则，我们更新动画状态，也请求一个新的时间戳。
 
-Again, I think we can cut this code down as we write more code like this and start seeing the general pattern. Should be exciting to find!
+再一次，随着写了这么多类似的代码，审视一遍它们，我们会发现一个通用的模式。发现它时你一定很激动！
 
-Finally we have a somewhat interesting `view` function! This example gets a nice bouncy animation, but we are just incrementing our `elapsedTime` in linear chunks. How is that happening?
+终于，无论如何我们有了一个有趣的 `view` 函数！这个例子有了一个优雅又充满活力的动画，而我们只是在时间线上增加了 `elapsedTime` 而已。这是怎么做到的呢？
 
-The `view` code itself is totally standard [`elm-svg`](http://package.elm-lang.org/packages/evancz/elm-svg/latest/) to make some fancier clickable shapes. The cool part of the view code is `toOffset` which calculates the rotation offset for the current `AnimationState`.
+`view` 的代码本身就是一个标准的 [`elm-svg`](http://package.elm-lang.org/packages/evancz/elm-svg/latest/)，可以制作一些漂亮的可点击图形。 代码中 最牛X 的是 `toOffset`，它计算了当前 `AnimationState` 的旋转的度数。
 
 ```elm
 -- import Easing exposing (ease, easeOutBounce, float)
@@ -772,12 +764,12 @@ toOffset animationState =
       ease easeOutBounce float 0 rotateStep duration elapsedTime
 ```
 
-We are using [@Dandandan](https://github.com/Dandandan)’s [easing package](http://package.elm-lang.org/packages/Dandandan/Easing/latest) which makes it easy to do [all sorts of cool easings](http://easings.net/) on numbers, colors, points, and any other crazy thing you want.
+我们使用 [@Dandandan](https://github.com/Dandandan) 的 [easing](http://package.elm-lang.org/packages/Dandandan/Easing/latest) 库，它使得对数字、颜色、点以及其他任何疯狂的东西的 [补间排序](http://easings.net/) 变得很简单。
 
-So the `ease` function is taking a number between 0 and `duration`. It then turns that into a number between 0 and `rotateStep` which we set to 90 degrees up at the top of our program. You also provide an easing. In our case we gave `easeOutBounce` which means as we slide from 0 to `duration`, we will get a number between 0 and 90 with that easing added. Pretty crazy! Try swapping `easeOutBounce` out for [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) and see how it looks!
+所以 `ease` 函数从 0 到 `duration` 之间取出一个数。然后它把它转变成一个 0 到 `rotateStep`（我们之前的代码里已经把它设置为 90 度了）之间的一个数。在这里你还提供了一个 `补间` 给 `easeOutBounce` 这意味着随着它从 0 到 `duration` 变化，我们会得到一个从 0 到 90 变化的数字。太疯狂了！尝试替换 `easeOutBounce` 为 [另一个补间](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) 看看是什么效果！
 
-From here, we wire everything together in `SpinSquarePair`, but that code is pretty much exactly the same as in example 2 and example 6.
+从这儿开始，我们把所有东西都拼装到了一起成为 `SpinSquarePair`, 而它的代码几乎与 例子2 和 例子6 的一模一样。
 
-Okay, so that is the basics of doing animation with this library! It is not clear if we nailed everything here, so let us know how things go as you get more experience. Hopefully we can make it even easier!
+好了，这就是用这些工具实现动画的基础！如果把所有东西都摆在这儿，可能不够清晰，所以当你有了更多的经验，请让我们知道你的收获。希望我们可以把她变得更简单！
 
-> **Note:** I expect we can build some abstractions on top of the core ideas here. This example does some lower level stuff, but I bet we can find some nice patterns to make this easier as we work with it more. If you find it weird now, try to make something better and tell us about it!
+> **注意：** 我期待我们可以在这些核心思想之上构建一些抽象概念。这个例子做了一些基础的事情，但是我打赌随着我们继续为它做出的工作，我们可以找到一些优雅的模式使它更简单。如果你觉得它现在还是很复杂，请试着让它变得更好，并把你的想法告诉我们吧！
