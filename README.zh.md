@@ -1,6 +1,6 @@
 # Elm 架构教程
 
-本教程概述“Elm 架构”，你在所有 [Elm][] 程序中都能看到它, 从 [TodoMVC][] 、[dreamwriter][] 到 [NoRedInk][] 和 [CircuitHub][] 在生产环境中运行的代码。这种基本模式无论用 Elm 或 JS 写前端代码时都很有用。
+本教程概述了“Elm 程序的架构”，你在所有 [Elm][] 程序中都能看到它，从 [TodoMVC][]、[dreamwriter][] 到 [NoRedInk][] 甚至 [CircuitHub][] 在生产环境中运行的代码。这种基本模式无论用在编写 Elm 或 JS 前端代码时都很有用。
 
 [Elm]: http://elm-lang.org/
 [TodoMVC]: https://github.com/evancz/elm-todomvc
@@ -8,8 +8,7 @@
 [NoRedInk]: https://www.noredink.com/
 [CircuitHub]: https://www.circuithub.com/
 
-Elm 架构是无限嵌套组件的简单模式，对于模块化，代码重用和测试都很有效。而且，这种模式可以很容易地用模块化的方式创建复杂的Web应用程序。我们将通过 8 个例子，一步步学习它的核心原则和模式：
-Ultimately, this pattern makes it easy to create complex web apps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
+Elm 架构是无限嵌套组件的简单模式，对于模块化、代码重用和测试都很有效。而且，这种模式可以很容易地用模块化的方式创建复杂的 Web 应用程序。我们将通过 8 个例子，一步步学习它的核心原则和模式：
 
   1. [计数器](http://evancz.github.io/elm-architecture-tutorial/examples/1.html)
   2. [双计数器](http://evancz.github.io/elm-architecture-tutorial/examples/2.html)
@@ -18,11 +17,11 @@ Ultimately, this pattern makes it easy to create complex web apps in a way that 
   5. [GIF 提取](http://evancz.github.io/elm-architecture-tutorial/examples/5.html)
   6. [双 GIF 提取器](http://evancz.github.io/elm-architecture-tutorial/examples/6.html)
   7. [GIF 提取器队列](http://evancz.github.io/elm-architecture-tutorial/examples/7.html)
-  8. [Pair of animating squares](http://evancz.github.io/elm-architecture-tutorial/examples/8.html)
+  8. [两个动画](http://evancz.github.io/elm-architecture-tutorial/examples/8.html)
 
-本教程绝对牛B，绝对屌！它会教会你必要的概念和想法，让做例子 7 和 8 超级简单。这笔对基础的投资绝对是值得的！
+本教程在某些方面上可以称得上前无古人，后无来者！它教会你必要的概念和想法，让开发例子7和例子8变得超级简单。你这笔基础投资绝对是物超所值得的！
 
-在这些例子架构中一个非常有趣的方面是，它会从 Elm 中 *自然浮现* 出来。Elm 语言的设计本身导致你走向这个架构，无论你是否已阅读本文件，知道它的好处与否。我只是在使用 Elm 时偶然发现了这种模式，并深深地为它的简单和强悍感到震惊。
+在这些示例的架构中有一个非常有趣的地方：它会从 Elm 中 *自然浮现* 出来。Elm 语言的设计本身导致你走向这个架构，无论你是否已阅读本文件，知道它的好处与否。我只是在使用 Elm 时偶然发现了这种模式，并深深地被它的简单和强悍所震惊。
 
 **注意**: 要使用此教程，必须和代码一起学习。[安装 Elm](http://elm-lang.org/install) 并 Fork 这个项目。在本教程的每个例子中都给出了如何运行项目代码的指令。
 
@@ -34,7 +33,7 @@ Ultimately, this pattern makes it easy to create complex web apps in a way that 
   * update
   * view
 
-你可以非常放心地使用下面的脚手架，然后为你的具体需求不断填写细节。
+你可以非常放心地使用下面的脚手架，然后为你的具体需求不断增加实现细节。
 
 > 如果你是第一次阅读 Elm 代码，请查看 [language docs](http://elm-lang.org/docs) 它涵盖了从语法到 “函数式思维”。[完整指南](http://elm-lang.org/docs#complete-guide) 的前两章可以帮你快速入门。
 
@@ -89,11 +88,11 @@ update action model =
     Decrement -> model - 1
 ```
 
-请注意，`Action` [union type][] *没有做任何事*。它简单地描述了可能的行动。如果有人认为当按下某个按钮时我们的计数器应该增加一倍，我们就需要一个新的 `Action`。这意味着这段代码非常清楚模型该如何转化。任何阅读此代码的人将立即知道那些是允许的，哪些不是。此外，他们将知道如何以一致的方式添加新的功能。
+请注意，`Action` [union type][] *没有做任何事*。它简单地描述了可能的行动。如果有人认为当按下某个按钮时我们的计数器应该增加一倍，我们只需要增加一个新的 `Action`。这意味着这段代码非常清楚 `model` 该如何变化。任何阅读此代码的人将立刻知道那些是允许的，哪些不是。此外，他们将知道如何以一致的方式添加新的功能。
 
 [union type]: http://elm-lang.org/learn/Union-Types.elm
 
-最后，我们创建了一种 `view` 来展示 `Model`. 我们使用 [elm-html][] 来创建一些 HTML 在浏览器中显示。我们将创建一个包裹的 div，内含：一个减量按钮，显示当前计数的 div，和一个增量按钮。
+最后，我们创建了一个 `view` 来展示 `Model`。我们使用 [elm-html][] 来创建一些在浏览器中显示的 HTML。我们先创建一个最外层的 div，它内含：一个减量按钮，显示当前计数的 div，和一个增量按钮。
 
 [elm-html]: http://elm-lang.org/blog/Blazing-Fast-Html.elm
 
@@ -111,14 +110,14 @@ countStyle =
   ...
 ```
 
-比较棘手的是 `view` 的 `Address` 功能。我们将在下一章深入讲解它！现在，我只是想让你注意到 **这段代码完全只是声明**。我们使用 `Model` 生成 `Html`。就是这样，在任何时候，我们不会手工改变 DOM，这给了库 [更大的自由度做出使聪明的优化][elm-html] 并且使渲染速度更快。这简直疯狂！而且, `view` 是一个普通的函数，所以我们创建 `view` 时可以得到 Elm 的模块系统，测试框架和库。
+比较棘手的是 `view` 的 `Address` 函数。我们会在下一章深入讲解它！现在，我只是想让你注意到 **这段代码完全只是声明**。我们使用 `Model` 生成 `Html`。就是这样，在任何时候，我们不会手工改变 DOM，这给了一些库 [更大的自由度做出更聪明的优化][elm-html] 并且使渲染速度更快。这简直疯了！而且, `view` 是一个普通的函数，所以我们创建 `view` 时可以得到 Elm 的模块系统，测试框架和库。
 
 这种模式是架构 Elm 程序的精髓。我们从现在开始看到每一个例子都将只是对这个基本模式的略微变化: `Model`，`update`，`view`。
 
 
 ## 启动程序
 
-几乎所有的 Elm 程序都只是用一小段代码，驱动整个应用程序。在本教程的每个例子中，该代码命名为 `Main.elm`。作为反例，有趣的代码如下所示：
+几乎所有的 Elm 程序都会有一个简短的代码，用它来驱动整个应用程序。在本教程的每个例子中，该代码被命名为 `Main.elm`。虽然是个反例，但它依然很有趣：
 
 ```elm
 import Counter exposing (update, view)
@@ -128,18 +127,18 @@ main =
   start { model = 0, update = update, view = view }
 ```
 
-我们使用 [`StartApp`](https://github.com/evancz/start-app) 这个库把初始模型的 `update` 和 `view` 连接起来。它只是对 Elm 的 [signals](http://elm-lang.org/learn/Using-Signals.elm) 做了一个小封装，所以你还不需要深入研究它的原理。
+我们使用 [`StartApp`](https://github.com/evancz/start-app) 这个库把初始 `model` 的 `update` 和 `view` 连接起来。它只是对 Elm 的 [signals](http://elm-lang.org/learn/Using-Signals.elm) 做了一个小封装，所以你还不需要深入研究它的原理。
 
 
-装配应用时的关键概念是 `Address`。每个事件处理器在 `view` 函数得到一个特定的地址，并且和数据块一起传递。`StartApp` 监视所有传给这个地址的消息，并把它们传给 `update` 函数。`model` 获得更新， 而且 [elm-html][] 负责渲染和高效的修改。
+装配应用的关键概念是 `Address`。每个事件处理器在 `view` 函数中得到一个特定的地址，并且和数据块一起传递过来。`StartApp` 监听所有传给这个地址的消息，然后把它们发送给 `update` 函数。`model` 获得更新， 而 [elm-html][] 负责渲染和高效的修改。
 
-这意味着，Elm 程序中的数据只在一个方向流动, 类似这样:
+这意味着，Elm 程序中的数据只会在一个方向上流动，类似这样:
 
 ![Signal Graph Summary](diagrams/signal-graph-summary.png)
 
 蓝色部分是我们 Elm 程序的核心，这正是 model/update/view，我们一直在讨论的模式。使用 Elm 编程，你可以一直呆在这个舒服的盒子里面，并取得很大的进步。
 
-注意，我们 *不执行* 送回应用程序的 `action` 。我们只是在发送一些数据。这种分离是一个关键的细节，使我们的逻辑完全从我们的视图代码分离。
+注意，我们 *不执行* 送回应用程序的 `action`。我们只是转发一些数据。这种分离是一个关键的细节，使我们的逻辑完全从视图代码中分离出来。
 
 
 
@@ -147,9 +146,9 @@ main =
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/2.html) / [see code](examples/2/)**
 
-在上一个例子里我们创造了一个计数器，但是当增加到两个计数器时这个模式会怎样变化呢？我们能继续保持模块化吗？
+在上一个例子里我们搞了一个计数器，如果增加到两个计数器时这个模式会怎样变化呢？我们能继续保持模块化吗？
 
-如果我们能完全重用例子一的代码就再好不过了。Elm 架构最疯狂的是 **我们可以一句不改地重用代码**。当我们创造例子一的计 `Counter` 模块时，它包括了所有实现细节所已我们可以在任何地方使用它。
+如果我们能完全重用 例子1 的代码就再好不过了。Elm 架构最疯狂的就是：**我们可以一句不变地重用代码**。当我们实现 例子1 的 `Counter` 模块时，它包括了所有细节，所以我们可以在任何地方使用它。
 
 ```elm
 module Counter (Model, init, Action, update, view) where
@@ -165,9 +164,9 @@ update : Action -> Model -> Model
 view : Signal.Address Action -> Model -> Html
 ```
 
-编写模块代码其实完全是在创建一种很强的抽象。我们期待的是合适的函数暴露和隐藏具体执行过程。从 `Counter` 模块的外部我们只能看到一些基础的值: `Model`, `init`, `Action`, `update`, 和 `view`。我们完全不用关心这些是如何实现的。事实上，也不可能知道这些是如何实现的。这意味着没人能以赖这些不公开的实现细节。
+编写模块代码其实完全是在创建一种很强的抽象。我们期待的是提供合适的函数接口，但是隐藏具体执行过程。从 `Counter` 模块的外部我们只能看到一些基础的值: `Model`、`init`、`Action`、`update` 和 `view`。我们完全不用关心这些是如何实现的。事实上，也不可能知道这些是如何实现的。这意味着没人需要依赖这些不公开的实现细节。
 
-所以我们本可以完全复制 `Counter` 模块, 但是我们还是使用它来实现 `CounterPair`。 像往常一样, 我们从一个 `Model` 开始:
+我们本可以完全复制 `Counter` 模块, 但我们还是使用它的一部分来实现 `CounterPair`。 像往常一样, 我们从一个 `Model` 开始：
 
 ```elm
 type alias Model =
@@ -182,9 +181,9 @@ init top bottom =
     }
 ```
 
-我们的 `Model` 纪录了两个计数器, 一个是需要在屏幕上显示的。这个完全描述了应用所有的状态。我们还有一个 `init` 函数可以在任何地方创建一个新的 `Model`。
+我们的 `Model` 纪录了两个计数器, 其中一个是需要在屏幕上显示的。这个 `Model` 完全描述了应用所有的状态。我们还有一个 `init` 函数可以在任何地方创建一个新的 `Model`。
 
-下一步我们来描述下我们想要支持的 `Actions`。我们需要的功能是: 重置所有的计数器, 更新顶部的计数器，或者更新下面的计数器。
+下一步来描述下我们想要支持的 `Actions`。我们需要的功能是：重置所有的计数器，更新顶部的计数器，或者更新下面的计数器。
 
 ```elm
 type Action
@@ -193,7 +192,7 @@ type Action
     | Bottom Counter.Action
 ```
 
-请注意，我们的 [union type][] 是参考 `Counter.Action` 类型，但是我们并知道那些 `action` 的细节。当我们创建 `update` 函数时，我们主要是路由这些 `Counter.Actions` 到正确的地方:
+请注意，我们的 [union type][] 是参考 `Counter.Action` 类型，但我们并不知道那些 `action` 的细节。当我们创建 `update` 函数时，主要工作是路由这些 `Counter.Actions` 到正确的地方：
 
 ```elm
 update : Action -> Model -> Model
@@ -223,24 +222,25 @@ view address model =
     , button [ onClick address Reset ] [ text "RESET" ]
     ]
 ```
-请注意，我们可以重用 `Counter.view` 函数在两个计数器之中。我们为每个计数器创建一个转发地址。大体上，我们这里做的事情其实是说：&ldquo;这些计数器将会给所有向外传递的消息打上 `Top` 或 `Bottom` 标签，以便我们区分&rdquo;
 
-这就是所有的事情。最屌的是我们可以一层又一层地保持嵌套。我们可以创建 `CounterPair` 模块，暴露关键值和方法，然后创建 `CounterPairPair` 或者任何其他我们需要的。
+请注意，我们可以在两个计数器之中复用 `Counter.view` 函数，给每个计数器创建一个转发地址。大体上，这里做的事情其实是：&ldquo;让这俩计数器给所有向外传递的消息打上 `Top` 或 `Bottom` 标志，以便区分&rdquo;
+
+这就是所有的工作。最屌的是我们可以一层又一层地保持嵌套。我们可以创建 `CounterPair` 模块，暴露关键值和方法，然后创建 `CounterPairPair` 或者任何其他我们需要的。
 
 
 ## Example 3: A Dynamic List of Counters
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/3.html) / [see code](examples/3/)**
 
-两个计数器已经很屌了，但一个可以随意添加和删除的计数器队列会怎么样呢？这种模式还有效吗？
+两个计数器已经很屌了，一个可以随意添加和删除的计数器队列会怎么样呢？这种模式还有效吗？
 
-而且我们可以完全像例子一盒例子二里那样复用 `Counter` !
+甚至我们可以完全像 例子1 和 例子2 里那样复用 `Counter`！
 
 ```elm
 module Counter (Model, init, Action, update, view)
 ```
 
-这意味着我们可以开始创建 `CounterList` 模块。 像往常一样, 我们从 `Model` 开始:
+这意味着我们可以开始创建 `CounterList` 模块了。 像往常一样, 我们从 `Model` 开始:
 
 ```elm
 type alias Model =
