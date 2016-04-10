@@ -121,9 +121,11 @@ This pattern is the essence of architecting Elm programs. Every example we see f
 Pretty much all Elm programs will have a small bit of code that drives the whole application. For each example in this tutorial, that code is broken out into `Main.elm`. For our counter example, the interesting code looks like this:
 
 ```elm
+import Html exposing (Html)
 import Counter exposing (update, view)
 import StartApp.Simple exposing (start)
 
+main : Signal Html
 main =
   start { model = 0, update = update, view = view }
 ```
