@@ -61,24 +61,24 @@ view =
   ...
 ```
 
-This tutorial is all about this pattern and small variations and extensions.
+這個教程都是由上面範例的這個設計模式 與一些小變化及插件所組成的。
 
 
 ## Example 1: A Counter
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/1.html) / [see code](examples/1/)**
 
-Our first example is a simple counter that can be incremented or decremented.
+第一個範例是一個簡單的計數器，可以進行增加與減少
 
-[The code](examples/1/Counter.elm) starts with a very simple model. We just need to keep track of a single number:
+[The code](examples/1/Counter.elm) 由一個很簡單的 model所組成， 我們要做的只是追蹤一個會改變的數字
 
 ```elm
 type alias Model = Int
 ```
 
-When it comes to updating our model, things are relatively simple again. We define a set of actions that can be performed, and an `update` function to actually perform those actions:
+當 model 更新時， 我們定義一系列 actions, 以及一個 `update` function用來接收 actions並執行相應的case
 
-```elm
+```elm 
 type Action = Increment | Decrement
 
 update : Action -> Model -> Model
@@ -88,11 +88,11 @@ update action model =
     Decrement -> model - 1
 ```
 
-Notice that our `Action` [union type][] does not *do* anything. It simply describes the actions that are possible. If someone decides our counter should be doubled when a certain button is pressed, that will be a new case in `Action`. This means our code ends up very clear about how our model can be transformed. Anyone reading this code will immediately know what is allowed and what is not. Furthermore, they will know exactly how to add new features in a consistent way.
+需要注意的是 `Action` [union type][] 並沒有做任何事， 他只是描述了一個動作的型態. 假設有人想讓計數器在點擊某個按鈕時可以讓數字變double, 這將需要增加一個新的 `Action`類型，這可以保持我們的Model簡潔，並且他人可以清楚的知道他可以對這個model進行何種操作
 
 [union type]: http://elm-lang.org/learn/Union-Types.elm
 
-Finally, we create a way to `view` our `Model`. We are using [elm-html][] to create some HTML to show in a browser. We will create a div that contains: a decrement button, a div showing the current count, and an increment button.
+ `view` our `Model`.我們使用 [elm-html][]來創造一個 HTML，其它包含一個 div 裡面裝有 decrement button、 a div showing the current count, and an increment button.
 
 [elm-html]: http://elm-lang.org/blog/Blazing-Fast-Html.elm
 
