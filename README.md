@@ -71,10 +71,13 @@ This tutorial is all about this pattern and small variations and extensions.
 
 Our first example is a simple counter that can be incremented or decremented.
 
-[The code](examples/1/Counter.elm) starts with a very simple model. We just need to keep track of a single number:
+[The code](examples/1/Counter.elm) starts with a very simple model. We just need to keep track of a single number, and provide a way to initialize it:
 
 ```elm
 type alias Model = Int
+
+init : Int -> Model
+init count = count
 ```
 
 When it comes to updating our model, things are relatively simple again. We define a set of actions that can be performed, and an `update` function to actually perform those actions:
@@ -121,11 +124,15 @@ This pattern is the essence of architecting Elm programs. Every example we see f
 Pretty much all Elm programs will have a small bit of code that drives the whole application. For each example in this tutorial, that code is broken out into `Main.elm`. For our counter example, the interesting code looks like this:
 
 ```elm
-import Counter exposing (update, view)
+import Counter exposing (init, update, view)
 import StartApp.Simple exposing (start)
 
 main =
-  start { model = 0, update = update, view = view }
+  start
+    { model = init 0
+    , update = update
+    , view = view
+    }
 ```
 
 We are using the [`StartApp`](https://github.com/evancz/start-app) package to wire together our initial model with the update and view functions. It is a small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm) so that you do not need to dive into that concept yet.

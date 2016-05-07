@@ -1,11 +1,11 @@
 
-import Counter exposing (update, view)
+import Counter exposing (init, update, view)
 import StartApp.Simple exposing (start)
 
 
 main =
   start
-    { model = 0
+    { model = init 0
     , update = update
     , view = view
     }
