@@ -1,6 +1,6 @@
 # The Elm Architecture
 
-這個教程 “The Elm Architecture” 你將會看到許多跟 [Elm][] 相關的程式, from [TodoMVC][] and [dreamwriter][] to the code running in production at [NoRedInk][] and [CircuitHub][]. The basic pattern is useful whether you are writing your front-end in Elm or JS or whatever else.
+這個教程 “The Elm Architecture” 你將會看到許多跟 [Elm][] 相關的程式, 包含 [TodoMVC][] 、 [dreamwriter][]以及正式上線的  [NoRedInk][] 、 [CircuitHub][]. 了解這個設計模式將對你在 Elm 中的程式或任何其他編程都很有幫助。
 
 [Elm]: http://elm-lang.org/
 [TodoMVC]: https://github.com/evancz/elm-todomvc
@@ -8,7 +8,7 @@
 [NoRedInk]: https://www.noredink.com/
 [CircuitHub]: https://www.circuithub.com/
 
-The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex web apps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
+ Elm 架構中的設計模式讓你的元件可以有無限嵌套. 對於模組化、 程式碼復用、 測試很有幫助，最終讓你可以簡單的設計出一個複雜但模組化的web程式。 下面將有八個範例
 
   1. [Counter](http://evancz.github.io/elm-architecture-tutorial/examples/1.html)
   2. [Pair of counters](http://evancz.github.io/elm-architecture-tutorial/examples/2.html)
@@ -19,24 +19,23 @@ The Elm Architecture is a simple pattern for infinitely nestable components. It 
   7. [List of GIF fetchers](http://evancz.github.io/elm-architecture-tutorial/examples/7.html)
   8. [Pair of animating squares](http://evancz.github.io/elm-architecture-tutorial/examples/8.html)
 
-This tutorial will really help! It will bring out the concepts and ideas necessary to get to make examples 7 and 8 super easy. Investing in the foundation will be worth it!
-
-One very interesting aspect of the architecture in all these programs is that it *emerges* from Elm naturally. The language design itself leads you towards this architecture whether you have read this document and know the benefits or not. I actually discovered this pattern just using Elm and have been shocked by its simplicity and power.
-
-**Note**: To follow along with this tutorial with code, [install Elm](http://elm-lang.org/install) and fork this repo. Each example in the tutorial gives instructions of how to run the code.
 
 
-## The Basic Pattern
 
-The logic of every Elm program will break up into three cleanly separated parts:
+**注意**: 要運行這些範例需先, [安裝 Elm](http://elm-lang.org/install) 以及 fork this repo. 每個範例都會教導你，該如何去運行它
+
+
+## Elm中的基本設計模式概念
+
+每個 Elm program 都有如下三個區塊架構:
+
 
   * model
   * update
   * view
 
-You can pretty reliably start with the following skeleton and then iteratively fill in details for your particular case.
 
-> If you are new to reading Elm code, check out the [language docs](http://elm-lang.org/docs) which covers everything from syntax to getting into a “functional mindset”. The first two sections of [the complete guide](http://elm-lang.org/docs#complete-guide) will get you up to speed!
+> 如果你還沒學習過elm可以先參考 [language docs](http://elm-lang.org/docs) 與[the complete guide](http://elm-lang.org/docs#complete-guide)
 
 ```elm
 -- MODEL
