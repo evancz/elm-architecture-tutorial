@@ -8,7 +8,7 @@ This tutorial outlines “The Elm Architecture” which you will see in all [Elm
 [NoRedInk]: https://www.noredink.com/
 [CircuitHub]: https://www.circuithub.com/
 
-The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex web apps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns:
+The Elm Architecture is a simple pattern for infinitely nestable components. It is great for modularity, code reuse, and testing. Ultimately, this pattern makes it easy to create complex web apps in a way that stays modular. We will run through 8 examples, slowly building on core principles and patterns: 
 
   1. [Counter](http://evancz.github.io/elm-architecture-tutorial/examples/1.html)
   2. [Pair of counters](http://evancz.github.io/elm-architecture-tutorial/examples/2.html)
