@@ -92,7 +92,7 @@ update action model =
 
 [union type]: http://elm-lang.org/learn/Union-Types.elm
 
- `view` our `Model`.我們使用 [elm-html][]來創造一個 HTML，其它包含一個 div 裡面裝有 decrement button、 a div showing the current count, and an increment button.
+ `view` our `Model`.我們使用 [elm-html][]來創造一個 HTML，其它包含一個 div 裡面裝有一個 decrement button以及a div showing the current count與 an increment button.
 
 [elm-html]: http://elm-lang.org/blog/Blazing-Fast-Html.elm
 
@@ -109,15 +109,15 @@ countStyle : Attribute
 countStyle =
   ...
 ```
+在 `view` 這個函式中的 `Address`我們將會在下一節提到! 在這裡我們使用了 `Model` 並產生一些 `Html`. 我們並沒有手動去更動DOM，
+這讓這個 library [有了更好的自由度及優化][elm-html] 並且讓畫面 rendering的速度更快。 以及 `view`是一個function ，我們可使用 Elm中的 module system、 test frameworks與其他 libraries 來創造 views.
 
-The tricky thing about our `view` function is the `Address`. We will dive into that in the next section! For now, I just want you to notice that **this code is entirely declarative**. We take in a `Model` and produce some `Html`. That is it. At no point do we mutate the DOM manually, which gives the library [much more freedom to make clever optimizations][elm-html] and actually makes rendering *faster* overall. It is crazy. Furthermore, `view` is a plain old function so we can get the full power of Elm&rsquo;s module system, test frameworks, and libraries when creating views.
-
-This pattern is the essence of architecting Elm programs. Every example we see from now on will be a slight variation on this basic pattern: `Model`, `update`, `view`.
+這種設計模式是Elm中的基本架構，接著的範例中都是以此種架構去進行 `Model`, `update`, `view`.
 
 
 ## Starting the Program
 
-Pretty much all Elm programs will have a small bit of code that drives the whole application. For each example in this tutorial, that code is broken out into `Main.elm`. For our counter example, the interesting code looks like this:
+在elm程式中，都會有一個主體的部分，程式從此開始進行，如同以下的範例均是以 `Main.elm`為主體
 
 ```elm
 import Counter exposing (update, view)
@@ -127,26 +127,24 @@ main =
   start { model = 0, update = update, view = view }
 ```
 
-We are using the [`StartApp`](https://github.com/evancz/start-app) package to wire together our initial model with the update and view functions. It is a small wrapper around Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm) so that you do not need to dive into that concept yet.
+我們使用了 [`StartApp`](https://github.com/evancz/start-app) 來建造初始的 model 、 update 與 view functions. 這即是Elm's [signals](http://elm-lang.org/learn/Using-Signals.elm)的概念，所以你暫時還不用了解signals的概念。
 
-The key to wiring up your application is the concept of an `Address`. Every event handler in our `view` function reports to a particular address. It just sends chunks of data along. The `StartApp` package monitors all the messages coming in to this address and feeds them into the `update` function. The model gets updated and [elm-html][] takes care of rendering the changes efficiently.
+其中的關鍵點在於 `Address`。 每個 event handler 於我們的 `view` function 之中會回傳一個特別的  address. It just sends chunks of data along.而 `StartApp` package 監測每個來自 address 的訊息，並轉送到 `update` function. 接著 model 被更新 ，然後[elm-html][] 把view更新
 
-This means values flow through an Elm program in only one direction, something like this:
+ Elm 程式中的單向資料流如同下圖的概念
 
 ![Signal Graph Summary](diagrams/signal-graph-summary.png)
 
-The blue part is our core Elm program which is exactly the model/update/view pattern we have been discussing so far. When programming in Elm, you can mostly think inside this box and make great progress.
-
-Notice we are not *performing* actions as they get sent back to our app. We are simply sending some data over. This separation is a key detail, keeping our logic totally separate from our view code.
+圖片中的藍色部分為 Elm 程式的核心，此即為我們先前提到的 model/update/view 概念。 未來在寫Elm程式時，即可以此種架構去規劃，讓邏輯的部分完全與View分開。
 
 
 ## Example 2: A Pair of Counters
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/2.html) / [see code](examples/2/)**
 
-In example 1 we created a basic counter, but how does that pattern scale when we want *two* counters? Can we keep things modular?
+在範例1中，我們建立了一個簡單的計數器。但我們該如何擴展架構，當我們需要兩個計數器時呢? 
 
-Wouldn't it be great if we could reuse all the code from example 1? The crazy thing about the Elm Architecture is that **we can reuse code with absolutely no changes**. When we created the `Counter` module in example one, it encapsulated all the implementation details so we can use them elsewhere:
+ Elm架構中的優點是  **我們可以不更動程式碼**來達成擴展架構。 當我們在上個範例創造 `Counter` 模組時,他把細節封裝起來，所以我們可以把他用在別處。
 
 ```elm
 module Counter (Model, init, Action, update, view) where
@@ -162,9 +160,11 @@ update : Action -> Model -> Model
 view : Signal.Address Action -> Model -> Html
 ```
 
-Creating modular code is all about creating strong abstractions. We want boundaries which appropriately expose functionality and hide implementation. From outside of the `Counter` module, we just see a basic set of values: `Model`, `init`, `Action`, `update`, and `view`. We do not care at all how these things are implemented. In fact, it is *impossible* to know how these things are implemented. This means no one can rely on implementation details that were not made public.
+創造模組化的code 是很抽象的。我們把一些 functionality 的部分提供出來並隱藏一些實做細節。在 `Counter` module外面，我們只看得到
+一些基本的關於 `Model`, `init`, `Action`, `update`, 與 `view`。我們並不在乎他們是如何被實做的。 事實上,這是不可能被知道的
+. 意思是當我們選擇不把他公開時，其他人無法知道我們的實做細節。
 
-So we can reuse our `Counter` module, but now we need to use it to create our `CounterPair`. As always, we start with a `Model`:
+所以我們可以複用 `Counter` module，並用他來創造 `CounterPair`，和先前一樣，我們先從 `Model`開始:
 
 ```elm
 type alias Model =
@@ -179,9 +179,10 @@ init top bottom =
     }
 ```
 
-Our `Model` is a record with two fields, one for each of the counters we would like to show on screen. This fully describes all of the application state. We also have an `init` function to create a new `Model` whenever we want.
+這個 `Model` 擁有兩個區塊分別為顯示在螢幕的top和bottom。用來完整描述我們應用程式中的 state。 以及一個 `init` function 
+讓我們在未來更新`Model`所用。 
 
-Next we describe the set of `Actions` we would like to support. This time our features should be: reset all counters, update the top counter, or update the bottom counter.
+接著我們將定義 `Actions` ，將包含: reset all counters、 update the top counter與 update the bottom counter.
 
 ```elm
 type Action
