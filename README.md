@@ -714,12 +714,12 @@ duration = second
 我們核心的model為 `angle` 指出了四方體的當前角度，而`animationState` 用來指出目前的動畫，假如現在沒有動畫，它將是 `Nothing`
 但假如現在有動畫，它將會是:
   
-  * `prevClockTime` &mdash; The most recent clock time which we will use for calculating time diffs. It will help us know exactly how many milliseconds have passed since last frame.
-  * `elapsedTime` &mdash; A number between 0 and `duration` that tells us how far we are in the animation.
+  * `prevClockTime` &mdash; 可以讓我們知道與上次的影格相距多少毫秒(milliseconds) 。
+  * `elapsedTime` &mdash;指出 數字0 與 `已經過時間`兩者之差距，用來了解動畫進行了多久。
 
-The `rotateStep` constant is just declaring how far it turns on each click. You can mess with that and everything should keep working.
+而`rotateStep` 用來宣告每次點擊他轉了多少角度，你可以隨意去改變它，不會對你程式造成影響。
 
-Now the interesting stuff all happens in `update`:
+有趣的事情發生在 `update`中:
 
 ```elm
 type Action
@@ -762,16 +762,22 @@ update msg model =
           )
 ```
 
-There are two kinds of `Action` we need to handle:
+我們需要處理兩種 `Action` :
 
-  - `Spin` indicates that a user clicked the shape, requesting a spin. So in the `update` function, we request a clock tick if there is no animation going and just let things stay as is if one is already going.
-  - `Tick` indicates that we have gotten a clock tick so we need to take an animation step. In the `update` function this means we need to update our `animationState`. So first we check if there is an animation in progress. If so, we just figure out what the `newElapsedTime` is by taking the current `elapsedTime` and adding a time diff to it. If the now elapsed time is greater than `duration` we stop animating and stop requesting new clock ticks. Otherwise we update the animation state and request another clock tick.
+  - `Spin` 當一個 user 點擊shape並且 requesting a spin。 接著在 `update` function中，假設現在沒有動畫在進行，我們會request 一個 clock tick，並且保持原來的狀態，但假裝已經有事情在作用了。
+  - `Tick` 當我們取得了 clock tick 我們將需要取得 animation step.在 `update` function中 ，我們需要去更新 `animationState`. 
+  -第一件事，我們會去檢查當下是否有動畫在進行， 假如有，我們會使用當下的 `elapsedTime` 去確認 `newElapsedTime`的值。
+並且在其中加入 `time diff`。
 
-Again, I think we can cut this code down as we write more code like this and start seeing the general pattern. Should be exciting to find!
+假設現在的elapsed time 大於 `duration` 我們將會停止動畫，並且暫停 requesting new clock ticks.
+假設小於， 我們會更新現在的 animation state 並且 request another clock tick。
 
-Finally we have a somewhat interesting `view` function! This example gets a nice bouncy animation, but we are just incrementing our `elapsedTime` in linear chunks. How is that happening?
 
-The `view` code itself is totally standard [`elm-svg`](http://package.elm-lang.org/packages/evancz/elm-svg/latest/) to make some fancier clickable shapes. The cool part of the view code is `toOffset` which calculates the rotation offset for the current `AnimationState`.
+
+最後，我們會有`view` function! 在這個範例有一個不錯的動畫 ，但其實我們只是以線性的方式去遞增`elapsedTime`。這是如何發生的?
+
+其中 `view` 的程式碼是源自 [`elm-svg`](http://package.elm-lang.org/packages/evancz/elm-svg/latest/) 為了做出其他更有趣並且可點擊產生動畫的形狀. 
+在view程式碼中 `toOffset` 將會計算目前所旋轉的偏移量 `AnimationState`.
 
 ```elm
 -- import Easing exposing (ease, easeOutBounce, float)
@@ -786,9 +792,9 @@ toOffset animationState =
       ease easeOutBounce float 0 rotateStep duration elapsedTime
 ```
 
-We are using [@Dandandan](https://github.com/Dandandan)’s [easing package](http://package.elm-lang.org/packages/Dandandan/Easing/latest) which makes it easy to do [all sorts of cool easings](http://easings.net/) on numbers, colors, points, and any other crazy thing you want.
+我們使用的是[@Dandandan](https://github.com/Dandandan)’s [easing package](http://package.elm-lang.org/packages/Dandandan/Easing/latest) 讓我們可以簡單的做到一些動畫 [all sorts of cool easings](http://easings.net/)包含數字,顏色,點,或是任何其他你想要的東西。.
 
-So the `ease` function is taking a number between 0 and `duration`. It then turns that into a number between 0 and `rotateStep` which we set to 90 degrees up at the top of our program. You also provide an easing. In our case we gave `easeOutBounce` which means as we slide from 0 to `duration`, we will get a number between 0 and 90 with that easing added. Pretty crazy! Try swapping `easeOutBounce` out for [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) and see how it looks!
+`ease` function 會取得一個數字在 0 與 `duration`間。 It then turns that into a number between 0 and `rotateStep` which we set to 90 degrees up at the top of our program. You also provide an easing. In our case we gave `easeOutBounce` which means as we slide from 0 to `duration`, we will get a number between 0 and 90 with that easing added. Pretty crazy! Try swapping `easeOutBounce` out for [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) and see how it looks!
 
 From here, we wire everything together in `SpinSquarePair`, but that code is pretty much exactly the same as in example 2 and example 6.
 
