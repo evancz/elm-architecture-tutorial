@@ -191,7 +191,8 @@ type Action
     | Bottom Counter.Action
 ```
 
-Notice that our [union type][] refers to the `Counter.Action` type, but we do not know the particulars of those actions. When we create our `update` function, we are mainly routing these `Counter.Actions` to the right place:
+注意到的是，上面的 [union type][] 指向 `Counter.Action` type,但我們並不知道這些 actions，當我們創造 `update` function時， 我們才將
+這些 `Counter.Actions` 指向正確的地方:
 
 ```elm
 update : Action -> Model -> Model
@@ -210,7 +211,7 @@ update action model =
       }
 ```
 
-So now the final thing to do is create a `view` function that shows both of our counters on screen along with a reset button.
+最後，我們建造一個 `view` function用來在畫面上顯示兩個 counters 與一個 reset button.
 
 ```elm
 view : Signal.Address Action -> Model -> Html
@@ -222,24 +223,24 @@ view address model =
     ]
 ```
 
-Notice that we are able to reuse the `Counter.view` function for both of our counters. For each counter we create a forwarding address. Essentially what we are doing here is saying, &ldquo;these counters will tag all outgoing messages with `Top` or `Bottom` so we can tell the difference.&rdquo;
+我們可以重複使用 `Counter.view` function 於兩個 counters. 於每個 counter 我們創造一個 forwarding address.我們在這裡做的事為，這兩個計數器會把傳出的訊息以 `Top` or `Bottom` tag起來，讓我們可以區分。
 
-That is the whole thing. The cool thing is that we can keep nesting more and more. We can take the `CounterPair` module, expose the key values and functions, and create a `CounterPairPair` or whatever it is we need.
+接著我們還可以讓他更巢狀化，我們可以使用 `CounterPair` module,指對外展示出一些 key values 與d functions, 再創造一個 `CounterPairPair` 或是任何你想要的。
 
 
 ## Example 3: A Dynamic List of Counters
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/3.html) / [see code](examples/3/)**
 
-A pair of counters is cool, but what about a list of counters where we can add and remove counters as we see fit? Can this pattern work for that too?
+接著我們要來創造一系列的計數器，我們可使用add或remove來增加與減少畫面上計數器的數量。
 
-Again we can reuse the `Counter` module exactly as it was in example 1 and 2!
+我們一樣複用 `Counter` module ，如同上面的範例。 
 
 ```elm
 module Counter (Model, init, Action, update, view)
 ```
 
-That means we can just get started on our `CounterList` module. As always, we begin with our `Model`:
+接著我們可以直接開始設計 `CounterList` module，和之前一樣 ，先從 `Model`開始:
 
 ```elm
 type alias Model =
@@ -250,12 +251,14 @@ type alias Model =
 type alias ID = Int
 ```
 
-Now our model has a list of counters, each annotated with a unique ID. These IDs allow us to distinguish between them, so if we need to update counter number 4 we have a nice way to refer to it. (This ID also gives us something convenient to [`key`][key] on when we are thinking about optimizing rendering, but that is not the focus of this tutorial!) Our model also contains a
-`nextID` which helps us assign unique IDs to each counter as we add new ones.
+現在我們的model有一系列的counter,每個均擁有一個獨特的ID，讓我們可以區別他們，
+(這些 ID 還帶給我們於 rendering時具有最佳化的表現[`key`][key] )
+
+我們的model 還包含了一個`nextID`這可以幫助我們在新增counter時，可以分配新的ID給他
 
 [key]: http://package.elm-lang.org/packages/evancz/elm-html/latest/Html-Attributes#key
 
-Now we can define the set of `Actions` that can be performed on our model. We want to be able to add counters, remove counters, and update certain counters.
+現在我們來定義一系列的`Actions` 用來傳給 model。包含了 add counters、 remove counters與update certain counters.
 
 ```elm
 type Action
@@ -264,7 +267,8 @@ type Action
     | Modify ID Counter.Action
 ```
 
-Our `Action` [union type][] is shockingly close to the high-level description. Now we can define our `update` function.
+
+現在我們可以定義`update` function.
 
 ```elm
 update : Action -> Model -> Model
@@ -291,18 +295,16 @@ update action model =
           { model | counters = List.map updateCounter model.counters }
 ```
 
-Here is a high-level description of each case:
+可以看下面的描述:
 
-  * `Insert` &mdash; First we create a new counter and put it at the end of
-    our counter list. Then we increment our `nextID` so that we have a fresh
-    ID next time around.
+  * `Insert` &mdash; 首先我們創造了一個新的計數器， 放在所有以建造的計數器的最後。
+  接著增加 `nextID` 來讓下一次使用。
 
-  * `Remove` &mdash; Drop the first member of our counter list.
+  * `Remove` &mdash;從許多計數器中移除最前面那個
 
-  * `Modify` &mdash; Run through all of our counters. If we find one with
-    a matching ID, we perform the given `Action` on that counter.
+  * `Modify` &mdash; 找尋這些計數器中與其符合的 ID, 我們在這個符合的計數器上執行這個 `Action`
 
-All that is left to do now is to define the `view`.
+最後是定義我們的 `view`.
 
 ```elm
 view : Signal.Address Action -> Model -> Html
@@ -318,24 +320,22 @@ viewCounter address (id, model) =
   Counter.view (Signal.forwardTo address (Modify id)) model
 ```
 
-The fun part here is the `viewCounter` function. It uses the same old
-`Counter.view` function, but in this case we provide a forwarding address that annotates all messages with the ID of the particular counter that is getting rendered.
+有趣的地方在於其中的 `viewCounter` function. 他使用先前的
+`Counter.view` function，但這次，我們提供了一個 forwarding address 上面標住了所有被 rendered的counter的相關訊息。
 
-When we create the actual `view` function, we map `viewCounter` over all of our counters and create add and remove buttons that report to the `address` directly.
+當我們真正創造 `view` function時， 我們對所有counters進行了`viewCounter`的map動作，並且創造兩個按鈕:add 、remove ，直接傳遞到 the `address` 中
 
-This ID trick can be used any time you want a dynamic number of subcomponents. Counters are very simple, but the pattern would work exactly the same if you had a list of user profiles or tweets or newsfeed items or product details.
+上面這種創造 ID的方法，可以用於任何你想要於子組件創造動態數字時，也可應用在其他範例，例如: list of user profiles 、 tweets 或是 newsfeed items 以及 product details中。
 
 
 ## Example 4: A Fancier List of Counters
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/4.html) / [see code](examples/4/)**
 
-Okay, keeping things simple and modular on a dynamic list of counters is pretty cool, but instead of a general remove button, what if each counter had its own specific remove button? Surely *that* will mess things up!
+但是，如果我們想要不只是有一個移除按鈕，而是想讓每個按鈕擁有自己專屬的移除按鈕呢? 
 
-Nah, it works.
 
-In this case our goals mean that we need a new way to view a `Counter` that adds a remove button. Interestingly, we can keep the `view` function from before and add a new `viewWithRemoveButton` function that provides a slightly different view of our underlying `Model`. This is pretty cool. We do not need to duplicate any code or do any crazy subtyping or overloading. We just add a new function to the public API to expose new functionality!
-
+要這麼做的話，我們先保持原本的`view` function 不變，並且可以新增一個`viewWithRemoveButton`，如以下範例:
 ```elm
 module Counter (Model, init, Action, update, view, viewWithRemoveButton, Context) where
 
@@ -357,9 +357,10 @@ viewWithRemoveButton context model =
     ]
 ```
 
-The `viewWithRemoveButton` function adds one extra button. Notice that the increment/decrement buttons send messages to the `actions` address but the delete button sends messages to the `remove` address. The messages we send along to `remove` are essentially saying, &ldquo;hey, whoever owns me, remove me!&rdquo; It is up to whoever owns this particular counter to do the removing.
+`viewWithRemoveButton` function 增加了一個額外的按鈕，其中  increment/decrement 按紐送出訊息到 `actions` address 中，但移除按鈕
+送出訊息到 `remove` address中。 在 `remove` 訊息中寫了類似下面的文字, &ldquo;任何擁有我的人請移除我!&rdquo; 
 
-Now that we have our new `viewWithRemoveButton`, we can create a `CounterList` module which puts all the individual counters together. The `Model` is the same as in example 3: a list of counters and a unique ID.
+現在我們有了新的 `viewWithRemoveButton`，我們可以建造一個 `CounterList` module 用來放置每個獨立的計數器， 其中 `Model` 和範例3的相同  a 
 
 ```elm
 type alias Model =
@@ -370,7 +371,7 @@ type alias Model =
 type alias ID = Int
 ```
 
-Our set of actions is a bit different. Instead of removing any old counter, we want to remove a specific one, so the `Remove` case now holds an ID.
+但這裡的 actions 有一些改變，這裡我們想讓他可以移除特定的按鈕，所以 `Remove` case 現在擁有一個 ID。
 
 ```elm
 type Action
@@ -378,8 +379,7 @@ type Action
     | Remove ID
     | Modify ID Counter.Action
 ```
-
-The `update` function is pretty similar to example 3 as well.
+其中的`update` function 和範例 3的相同。
 
 ```elm
 update : Action -> Model -> Model
@@ -405,9 +405,10 @@ update action model =
           { model | counters = List.map updateCounter model.counters }
 ```
 
-In the case of `Remove`, we take out the counter that has the ID we are supposed to remove. Otherwise, the cases are quite close to how they were before.
+其中的 `Remove`， 我們過濾出了想要的ID
 
-Finally, we put it all together in the `view`:
+
+最後是 `view`:
 
 ```elm
 view : Signal.Address Action -> Model -> Html
@@ -426,25 +427,26 @@ viewCounter address (id, model) =
       Counter.viewWithRemoveButton context model
 ```
 
-In our `viewCounter` function, we construct the `Counter.Context` to pass in all the necessary forwarding addresses. In both cases we annotate each `Counter.Action` so that we know which counter to modify or remove.
+在 `viewCounter` function中，我們建造了 `Counter.Context` 用來傳遞所有必要的 forwarding addresses。在兩個情況，我們均標註了 `Counter.Action` 讓我們知道該移除或修改哪個counter、
 
 
-## Big Lessons So Far
+## Big Lessons So Far(到目前為止)
 
-**Basic Pattern** &mdash; Everything is built around a `Model`, a way to `update` that model, and a way to `view` that model. Everything is a variation on this basic pattern.
+**Basic Pattern** &mdash; 所有東西都是圍繞著 `Model`所建構的，包含 `更新` model, 以及將model轉為 `view` ，都是根據這個設計模式在變動。
 
-**Nesting Modules** &mdash; Forwarding addresses makes it easy to nest our basic pattern, hiding implementation details entirely. We can nest this pattern arbitrarily deep, and each level only needs to know about what is going on one level lower.
+**Nesting Modules** &mdash; Forwarding addresses 讓巢狀化更加簡單，把實做細節整個隱藏起來。 我們可以繼續往下一層深入實做，而每一層只需要知道在他的上一層發生了什麼事就好。
 
-**Adding Context** &mdash; Sometimes to `update` or `view` our model, extra information is needed. We can always add some `Context` to these functions and pass in all the additional information we need without complicating our `Model`.
+**Adding Context** &mdash; 有時在 `更新` 或是 `檢視` 我們的 model時，額外的資訊是很必要的。我們可以增加一些 `Context`到這些 functions 在避免 `Model`變得更複雜的情況下，將這些資訊傳遞進去。
 
 ```elm
 update : Context -> Action -> Model -> Model
 view : Context' -> Model -> Html
 ```
 
-At every level of nesting we can derive the specific `Context` needed for each submodule.
+在巢狀結構下的每一層， 我們可以導出一些特定的 `Context`給子模組使用。
 
-**Testing is Easy** &mdash; All of the functions we have created are [pure functions][pure]. That makes it extremely easy to test your `update` function. There is no special initialization or mocking or configuration step, you just call the function with the arguments you would like to test.
+**Testing is Easy** &mdash; 我們在這建立的所有function都是所謂的 [pure functions][pure].這讓你在測試你的 `update` function時
+變得很簡單。 在這之中沒有特定的步驟，你可以直接呼叫你想測試的函式與參數來進行測試。
 
 [pure]: http://en.wikipedia.org/wiki/Pure_function
 
@@ -453,11 +455,11 @@ At every level of nesting we can derive the specific `Context` needed for each s
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/5.html) / [see code](examples/5/)**
 
-So we have covered how to create infinitely nestable components, but what happens when we want to do an HTTP request from somewhere in there? Or talk to a database? This example starts using [the `elm-effects` package][fx] to create a simple component that fetches random gifs from giphy.com with the topic “funny cats”. 
+我們展示了如何建立巢狀的元件， 但，我們該如何執行一個HTTP request呢?如何跟 database 取得資料?在這個範例中使用了 [the `elm-effects` package][fx]來建立一個簡單的元件，可以從 giphy.com取得隨機的 gifs  其中包含 “funny cats” topic。
 
 [fx]: http://package.elm-lang.org/packages/evancz/elm-effects/latest
 
-As you look through [the implementation](examples/5/RandomGif.elm), notice that it is pretty much the same code as the counter in example 1. The `Model` is very typical:
+在這個範例[the implementation](examples/5/RandomGif.elm)，與範例1很類似， `Model` 如下(非常典型)l:
 
 ```elm
 type alias Model =
