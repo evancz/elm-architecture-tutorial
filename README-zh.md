@@ -2,7 +2,7 @@
 
 ##開始之前:建議你可以查看包含安裝等步驟的完整版於:
 
-[elm-lang 的中文手冊](https://github.com/EasonWang01/elm-lang-chinese-manual/blob/master/README.md#the-elm-architecture)
+[elm-lang 的中文手冊](https://github.com/EasonWang01/elm-lang-chinese-manual/blob/master/README.md)
 
 
 這個教程 “The Elm Architecture” 你將會看到許多跟 [Elm][] 相關的程式, 包含 [TodoMVC][] 、 [dreamwriter][]以及正式上線的  [NoRedInk][] 、 [CircuitHub][]. 了解這個設計模式將對你在 Elm 中的程式或任何其他編程都很有幫助。
