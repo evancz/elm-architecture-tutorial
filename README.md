@@ -643,9 +643,11 @@ update action model =
         )
 ```
 
-So in each branch we call the `RandomGif.update` function which is returning a new model and some effects we are calling `fx`. We return an updated model like normal, but we need to do some extra work on our effects. Instead of returning them directly, we use [`Effects.map`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#map) function to turn them into the same kind of `Action`. This works very much like `Signal.forwardTo`, letting us tag the values to make it clear how they should be routed.
+在每個分支中，我們使用了 `RandomGif.update` function 其可以回傳一個 model 以及(effect)  `fx`。和先前一樣先回傳一個普通的model，
+但我們需要在effects中做一些不同的事。我們這次不讓他直接return，我們將使用 [`Effects.map`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#map) function
+將他們轉為同類型的`Action`，和 `Signal.forwardTo`類似，讓我們對values進行 tag的動作，讓我們清楚的知道它該被導向哪裡。
 
-The same thing happens in the `init` function. We provide a topic for each random GIF viewer and get back an initial model and some effects.
+而`init` function也做一樣的事， 我們提供一個topic 給每個 random GIF viewer 並且得到回傳的初始 model 與 effects。
 
 ```elm
 init : String -> String -> (Model, Effects Action)
@@ -664,31 +666,35 @@ init leftTopic rightTopic =
 -- Effects.batch : List (Effects a) -> Effects a
 ```
 
-In this case we not only use `Effects.map` to tag results appropriately, we also use the [`Effects.batch`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#batch) function to lump them all together. All of the requested tasks will get spawned off and run independently, so the left and right effects will be in progress at the same time.
+在這個範例，我們不止使用 `Effects.map` 來 tag 結果，我們還會使用 [`Effects.batch`](http://package.elm-lang.org/packages/evancz/elm-effects/latest/Effects#batch) function 來讓他們混在一起。
+ 每個 requested tasks 將會獨立的運行，所以 left 與 right effects將會同一時間一起運作。
 
 
 ## Example 7: List of random GIF viewers
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/7.html) / [see code](examples/7/)**
 
-This example lets you have a list of random GIF viewers where you can create the topics yourself. Again, we reuse the core `RandomGif` module exactly as is.
+這個範例讓你有一系列的 random GIF viewers 你可以創造你自己的topics，並且，我們仍然使用之前的 `RandomGif` module。
 
-When you look through [the implementation](examples/7/RandomGifList.elm) you will see that it exactly corresponds to example 3. We put all of our submodels in a list associated with an ID and do our operations based on those IDs. The only thing new is that we are using `Effects` in the `init` and `update` function, putting them together with `Effects.map` and `Effects.batch`.
+當你看完 [the implementation](examples/7/RandomGifList.elm) 你會發現他和 範例 3是相對應的。我們將所有子model放在相同list ，
+並用ID來分辨與連結它們， 唯一改變的地方在於:在 `init` 與 `update` function中的 `Effects` ， 將使用 `Effects.map` 與 `Effects.batch`把他們放在一起。
 
-Please open an issue if this section should go into more detail about how things work!
+
+如果你對下面這個章節有任何的問題，你可以在這個repo創造一個issue來解決你的問題。
 
 
 ## Example 8: Animation
 
 **[demo](http://evancz.github.io/elm-architecture-tutorial/examples/8.html) / [see code](examples/8/)**
 
-Now we have seen components with tasks that can be nested in arbitrary ways, but how does it work for animation?
+現在我們知道擁有tasks的 components 可以被巢狀的使用， 但要怎麼把它應用在動畫中呢?
 
-Interestingly, it is pretty much exactly the same! (Or perhaps it is no longer surprising that the same pattern as in all the other examples works here too... Seems like a pretty good pattern!)
+有趣的是， 它的做法和先前的做法類似! 
 
-This example is a pair of clickable squares. When you click a square, it rotates 90 degrees. Overall the code is an adapted form of example 2 and example 6 where we keep all the logic for animation in `SpinSquare.elm` which we then reuse multiple times in `SpinSquarePair.elm`. 
+這個範例是兩個可以點擊的四方體， 當你點擊後， 它會旋轉90度。總體來說這裡的code 源自於 範例 2 和 範例 6 
+我們將所有跟動畫相關的邏輯放在`SpinSquare.elm` 我們重複使用的部分放在 `SpinSquarePair.elm`. 
 
-So all the new and interesting stuff is happening [in `SpinSquare`](examples/8/SpinSquare.elm), so we are going to focus on that code. The first thing we need is a model:
+根據這個範例 [in `SpinSquare`](examples/8/SpinSquare.elm) 第一件要做的事為處理 model:
 
 ```elm
 type alias Model =
@@ -705,7 +711,8 @@ rotateStep = 90
 duration = second
 ```
 
-So our core model is the `angle` that the square is currently at and then some `animationState` to track what is going on with any ongoing animation. If there is no animation it is `Nothing`, but if something is happening it holds:
+我們核心的model為 `angle` 指出了四方體的當前角度，而`animationState` 用來指出目前的動畫，假如現在沒有動畫，它將是 `Nothing`
+但假如現在有動畫，它將會是:
   
   * `prevClockTime` &mdash; The most recent clock time which we will use for calculating time diffs. It will help us know exactly how many milliseconds have passed since last frame.
   * `elapsedTime` &mdash; A number between 0 and `duration` that tells us how far we are in the animation.
