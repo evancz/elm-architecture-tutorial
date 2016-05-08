@@ -794,10 +794,14 @@ toOffset animationState =
 
 我們使用的是[@Dandandan](https://github.com/Dandandan)’s [easing package](http://package.elm-lang.org/packages/Dandandan/Easing/latest) 讓我們可以簡單的做到一些動畫 [all sorts of cool easings](http://easings.net/)包含數字,顏色,點,或是任何其他你想要的東西。.
 
-`ease` function 會取得一個數字在 0 與 `duration`間。 It then turns that into a number between 0 and `rotateStep` which we set to 90 degrees up at the top of our program. You also provide an easing. In our case we gave `easeOutBounce` which means as we slide from 0 to `duration`, we will get a number between 0 and 90 with that easing added. Pretty crazy! Try swapping `easeOutBounce` out for [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing) and see how it looks!
+`ease` function 會取得一個數字在 0 與 `duration`間。 接著把它轉換為 0 與 `rotateStep` 間的數字
+並且提供一個 easing， 在範例中，我們提供了 `easeOutBounce` 意思為我們slide from 0 to `duration`，我們將會獲得一個數字在 0 and 90 之間，並且具有easing 效果。
 
-From here, we wire everything together in `SpinSquarePair`, but that code is pretty much exactly the same as in example 2 and example 6.
+接著在下面的連結試試 `easeOutBounce` 吧 [other easings](http://package.elm-lang.org/packages/Dandandan/Easing/latest/Easing)
 
-Okay, so that is the basics of doing animation with this library! It is not clear if we nailed everything here, so let us know how things go as you get more experience. Hopefully we can make it even easier!
 
-> **Note:** I expect we can build some abstractions on top of the core ideas here. This example does some lower level stuff, but I bet we can find some nice patterns to make this easier as we work with it more. If you find it weird now, try to make something better and tell us about it!
+我們使用 `SpinSquarePair`將大部分的東西結合再一起，但他們其實和範例  2 與範例 6 類似。
+
+以上即是我們使用這個  library所進行的animation ! 如果有任何不清楚的地方請提出來讓我們知道!
+
+
