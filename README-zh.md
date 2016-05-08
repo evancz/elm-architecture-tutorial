@@ -365,7 +365,7 @@ viewWithRemoveButton context model =
 `viewWithRemoveButton` function 增加了一個額外的按鈕，其中  increment/decrement 按紐送出訊息到 `actions` address 中，但移除按鈕
 送出訊息到 `remove` address中。 在 `remove` 訊息中寫了類似下面的文字, &ldquo;任何擁有我的人請移除我!&rdquo; 
 
-現在我們有了新的 `viewWithRemoveButton`，我們可以建造一個 `CounterList` module 用來放置每個獨立的計數器， 其中 `Model` 和範例3的相同  a 
+現在我們有了新的 `viewWithRemoveButton`，我們可以建造一個 `CounterList` module 用來放置每個獨立的計數器， 其中 `Model` 和範例3的相同   
 
 ```elm
 type alias Model =
