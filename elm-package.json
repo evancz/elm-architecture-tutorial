@@ -4,7 +4,7 @@
     "repository": "https://github.com/elm-lang/elm-architecture-tutorial.git",
     "license": "BSD3",
     "source-directories": [
-        "examples"
+        "nesting"
     ],
     "exposed-modules": [],
     "dependencies": {
