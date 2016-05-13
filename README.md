@@ -19,4 +19,4 @@ elm-reactor
 
 This will download this repo and start a server that compiles Elm code for you.
 
-Now go to [http://localhost:8000/](http://localhost:8000/) and start looking at the examples. When you edit an Elm file, just refresh the corresponding page in your browser and it will recompile.
+Now go to [http://localhost:8000/](http://localhost:8000/) and start looking at the `examples/` directory. When you edit an Elm file, just refresh the corresponding page in your browser and it will recompile.
