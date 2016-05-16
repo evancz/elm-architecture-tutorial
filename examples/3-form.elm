@@ -39,8 +39,8 @@ type Msg
 
 
 update : Msg -> Model -> Model
-update action model =
-  case action of
+update msg model =
+  case msg of
     Name name ->
       { model | name = name }
 
