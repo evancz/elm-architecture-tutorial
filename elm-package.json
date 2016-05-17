@@ -1,0 +1,18 @@
+{
+    "version": "1.0.0",
+    "summary": "Examples of The Elm Architecture",
+    "repository": "https://github.com/elm-lang/elm-architecture-tutorial.git",
+    "license": "BSD3",
+    "source-directories": [
+        "nesting"
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "4.0.0 <= v < 5.0.0",
+        "elm-lang/html": "1.0.0 <= v < 2.0.0",
+        "elm-lang/svg": "1.0.0 <= v < 2.0.0",
+        "elm-lang/websocket": "1.0.0 <= v < 2.0.0",
+        "evancz/elm-http": "3.0.1 <= v < 4.0.0"
+    },
+    "elm-version": "0.17.0 <= v < 0.18.0"
+}
