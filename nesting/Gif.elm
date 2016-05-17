@@ -1,4 +1,4 @@
-module RandomGif exposing (Model, init, Msg, update, view, subscriptions)
+module Gif exposing (Model, init, Msg, update, view, subscriptions)
 
 import Html exposing (..)
 import Html.App as Html
@@ -66,10 +66,22 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ h2 [] [text model.topic]
-    , button [ onClick MorePlease ] [ text "More Please!" ]
+    [ h2 [] [ text model.topic ]
+    , img [ imgStyle model.gifUrl ] []
     , br [] []
-    , img [src model.gifUrl] []
+    , button [ onClick MorePlease ] [ text "More Please!" ]
+    ]
+
+
+imgStyle : String -> Attribute msg
+imgStyle url =
+  style
+    [ ("display", "inline-block")
+    , ("width", "200px")
+    , ("height", "200px")
+    , ("background-position", "center center")
+    , ("background-size", "cover")
+    , ("background-image", ("url('" ++ url ++ "')"))
     ]
 
 
