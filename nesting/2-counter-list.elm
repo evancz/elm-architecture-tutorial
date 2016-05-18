@@ -19,18 +19,21 @@ main =
 
 
 type alias Model =
-    { counters : List ( ID, Counter.Model )
-    , nextID : ID
-    }
+  { counters : List IndexedCounter
+  , uid : Int
+  }
 
 
-type alias ID = Int
+type alias IndexedCounter =
+  { id : Int
+  , model : Counter.Model
+  }
 
 
 init : Model
 init =
   { counters = []
-  , nextID = 0
+  , uid = 0
   }
 
 
@@ -41,35 +44,28 @@ init =
 type Msg
   = Insert
   | Remove
-  | Modify ID Counter.Msg
+  | Modify Int Counter.Msg
 
 
 update : Msg -> Model -> Model
-update msg model =
-  case msg of
+update message ({counters, uid} as model) =
+  case message of
     Insert ->
-      let
-        newCounter =
-          ( model.nextID, Counter.init 0 )
-
-        newCounters =
-          model.counters ++ [ newCounter ]
-      in
-        Model newCounters (model.nextID + 1)
+      { model
+        | counters = counters ++ [ IndexedCounter uid (Counter.init 0) ]
+        , uid = uid + 1
+      }
 
     Remove ->
-      { model | counters = List.drop 1 model.counters }
+      { model | counters = List.drop 1 counters }
 
-    Modify id counterMsg ->
-      let
-        updateCounter (counterID, counterModel) =
-          if counterID == id then
-            (counterID, Counter.update counterMsg counterModel)
+    Modify id msg ->
+      { model | counters = List.map (updateHelp id msg) counters }
 
-          else
-            (counterID, counterModel)
-      in
-        { model | counters = List.map updateCounter model.counters }
+
+updateHelp : Int -> Counter.Msg -> IndexedCounter -> IndexedCounter
+updateHelp targetId msg {id, model} =
+  IndexedCounter id (if targetId == id then Counter.update msg model else model)
 
 
 
@@ -86,11 +82,11 @@ view model =
       button [ onClick Insert ] [ text "Add" ]
 
     counters =
-      List.map viewCounter model.counters
+      List.map viewIndexedCounter model.counters
   in
     div [] ([remove, insert] ++ counters)
 
 
-viewCounter : (ID, Counter.Model) -> Html Msg
-viewCounter (id, model) =
+viewIndexedCounter : IndexedCounter -> Html Msg
+viewIndexedCounter {id, model} =
   App.map (Modify id) (Counter.view model)
