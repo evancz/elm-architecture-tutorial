@@ -1,4 +1,4 @@
-module Counter exposing (Model, init, Msg, update, view)
+module Counter exposing (Model, Msg, init, update, view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
