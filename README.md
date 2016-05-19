@@ -4,7 +4,7 @@ The Elm Architecture is a simple pattern for infinitely nestable components.
 
 This repo parallels [The Elm Architecture tutorial][arch], allowing you to follow along and compile things locally.
 
-[arch]: https://guide.elm-lang.org/architecture/index.html
+[arch]: http://guide.elm-lang.org/architecture/index.html
 
 
 ## Run The Examples
