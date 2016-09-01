@@ -1,6 +1,6 @@
 # Elm
 
-Elm is a programming language that compiles to JavaScript. The highlight features are great performance and no runtime exceptions. You can read more about all that [here](http://elm-lang.org/).
+Elm is a programming language that compiles to JavaScript. The highlight features are great performance and no runtime exceptions. You can read more about all that on the [home page](http://elm-lang.org/).
 
 This repo focuses **The Elm Architecture**, an architecture pattern you see in all Elm programs. It has influenced projects like Redux that borrow core concepts but add many JS-focused ideas.
 
