@@ -81,6 +81,9 @@ imgStyle url =
     , ("height", "200px")
     , ("background-position", "center center")
     , ("background-size", "cover")
+    , ("-webkit-background-size", "cover")
+    , ("-moz-background-size", "cover")
+    , ("-o-background-size", "cover")
     , ("background-image", ("url('" ++ url ++ "')"))
     ]
 
