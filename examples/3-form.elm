@@ -65,7 +65,7 @@ view model =
     ]
 
 
-viewValidation : Model -> Html msg
+viewValidation : Model -> Html Msg
 viewValidation model =
   let
     (color, message) =
