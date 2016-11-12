@@ -1,13 +1,12 @@
 import Html exposing (Html, Attribute, div, fieldset, input, label, text)
-import Html.App as App
-import Html.Attributes exposing (name, style, type')
+import Html.Attributes exposing (name, style, type_)
 import Html.Events exposing (onClick)
 import Markdown
 
 
 
 main =
-  App.beginnerProgram { model = chapter1, update = update, view = view }
+  Html.beginnerProgram { model = chapter1, update = update, view = view }
 
 
 
@@ -84,7 +83,7 @@ radio value msg =
   label
     [ style [("padding", "20px")]
     ]
-    [ input [ type' "radio", name "font-size", onClick msg ] []
+    [ input [ type_ "radio", name "font-size", onClick msg ] []
     , text value
     ]
 

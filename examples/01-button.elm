@@ -1,11 +1,11 @@
 import Html exposing (Html, button, div, text)
-import Html.App as App
+import Html
 import Html.Events exposing (onClick)
 
 
 
 main =
-  App.beginnerProgram
+  Html.beginnerProgram
     { model = model
     , view = view
     , update = update
