@@ -9,8 +9,8 @@ import Json.Decode as Decode
 main =
   Html.program
     { init = init "cats"
-    , view = view
     , update = update
+    , view = view
     , subscriptions = subscriptions
     }
 
