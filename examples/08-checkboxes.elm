@@ -60,7 +60,7 @@ view model =
     ]
 
 
-checkbox : msg -> String -> Html msg
+checkbox : Msg -> String -> Html Msg
 checkbox msg name =
   label
     [ style [("padding", "20px")]

@@ -79,6 +79,6 @@ view model =
     ]
 
 
-viewMessage : String -> Html msg
+viewMessage : String -> Html Msg
 viewMessage msg =
   div [] [ text msg ]
