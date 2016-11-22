@@ -78,7 +78,7 @@ view model =
     ]
 
 
-radio : String -> msg -> Html msg
+radio : String -> Msg -> Html Msg
 radio value msg =
   label
     [ style [("padding", "20px")]
@@ -88,7 +88,7 @@ radio value msg =
     ]
 
 
-sizeToStyle : FontSize -> Attribute msg
+sizeToStyle : FontSize -> Attribute Msg
 sizeToStyle fontSize =
   let
     size =
