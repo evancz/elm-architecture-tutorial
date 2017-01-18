@@ -1,7 +1,7 @@
 import Html exposing (..)
 import Html.Events exposing (..)
+import Html.Attributes exposing (src)
 import Random
-
 
 
 main =
@@ -18,14 +18,13 @@ main =
 
 
 type alias Model =
-  { dieFace : Int
+  { dieFace : (Int, Int)
   }
 
 
 init : (Model, Cmd Msg)
 init =
-  (Model 1, Cmd.none)
-
+  (Model (1,1), Cmd.none)
 
 
 -- UPDATE
@@ -33,18 +32,17 @@ init =
 
 type Msg
   = Roll
-  | NewFace Int
+  | NewFace (Int, Int)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Roll ->
-      (model, Random.generate NewFace (Random.int 1 6))
+      (model, Random.generate NewFace (Random.pair (Random.int 1 5) (Random.int 1 5)))
 
-    NewFace newFace ->
-      (Model newFace, Cmd.none)
-
+    NewFace pair ->
+      (Model pair, Cmd.none)
 
 
 -- SUBSCRIPTIONS
@@ -61,7 +59,13 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
+  let
+    (a,b) = model.dieFace
+  in
   div []
-    [ h1 [] [ text (toString model.dieFace) ]
+    [ h1 [] [ text (toString a) ]
+    , h1 [] [ text (toString b) ]
+    , img [src ("http://www.homeschoolmath.net/teaching/a/images/dieface-" ++ (toString a) ++ ".gif") ] []
+    , img [src ("http://www.homeschoolmath.net/teaching/a/images/dieface-" ++ (toString b) ++ ".gif") ] []
     , button [ onClick Roll ] [ text "Roll" ]
     ]
