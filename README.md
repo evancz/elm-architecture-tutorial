@@ -22,6 +22,7 @@ After you [install Elm](http://guide.elm-lang.org/get_started.html), run the fol
 ```bash
 git clone https://github.com/evancz/elm-architecture-tutorial.git
 cd elm-architecture-tutorial
+elm-package install
 elm-reactor
 ```
 
