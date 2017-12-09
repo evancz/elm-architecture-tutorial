@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "Examples of The Elm Architecture",
-    "repository": "https://github.com/elm-lang/elm-architecture-tutorial.git",
+    "repository": "https://github.com/evancz/elm-architecture-tutorial.git",
     "license": "BSD3",
     "source-directories": [
         "nesting"
