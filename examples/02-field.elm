@@ -1,16 +1,15 @@
-import Html exposing (Html, div, input, text)
+import Browser
+import Html exposing (Html, Attribute, div, input, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-import String
 
+
+
+-- MAIN
 
 
 main =
-  Html.beginnerProgram
-    { model = model
-    , view = view
-    , update = update
-    }
+  Browser.sandbox { init = init, update = update, view = view }
 
 
 
@@ -22,9 +21,9 @@ type alias Model =
   }
 
 
-model : Model
-model =
-  Model ""
+init : Model
+init =
+  { content = "" }
 
 
 
@@ -33,6 +32,7 @@ model =
 
 type Msg
   = Change String
+
 
 update : Msg -> Model -> Model
 update msg model =
@@ -48,6 +48,6 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ input [ placeholder "Text to reverse", onInput Change ] []
+    [ input [ placeholder "Text to reverse", value model.content, onInput Change ] []
     , div [] [ text (String.reverse model.content) ]
     ]
