@@ -1,9 +1,10 @@
 module Main exposing (Model, Msg(..), init, main, update, view, viewInput, viewValidation)
 
 import Browser
+import Debug exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 
 
 
@@ -22,13 +23,14 @@ type alias Model =
     { name : String
     , password : String
     , passwordAgain : String
-    , age : String
+    , age : Int
+    , submitted : Bool
     }
 
 
 init : Model
 init =
-    Model "" "" "" ""
+    Model "" "" "" 0 False
 
 
 
@@ -36,26 +38,30 @@ init =
 
 
 type Msg
-    = Name String
-    | Password String
-    | PasswordAgain String
-    | Age String
+    = Submit
+    | NameInput String
+    | PasswordInput String
+    | PasswordAgainInput String
+    | AgeInput String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Name name ->
-            { model | name = name }
+        Submit ->
+            { model | submitted = log "Submitted" True }
 
-        Password password ->
-            { model | password = password }
+        NameInput name ->
+            { model | name = log "name" name }
 
-        PasswordAgain password ->
-            { model | passwordAgain = password }
+        PasswordInput password ->
+            { model | password = log "password" password }
 
-        Age age ->
-            { model | age = age }
+        PasswordAgainInput passwordAgain ->
+            { model | passwordAgain = log "password again" passwordAgain }
+
+        AgeInput age ->
+            { model | age = log "age" (String.toInt age |> Maybe.withDefault 0) }
 
 
 
@@ -65,11 +71,12 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.form []
-        [ viewInput "text" "Name" model.name Name
-        , viewInput "password" "Password" model.password Password
-        , viewInput "password" "Re-enter Password" model.passwordAgain PasswordAgain
-        , viewInput "text" "Enter your age" model.age Age
-        , viewSubmit "Submit"
+        [ viewInput "text" "Name" model.name NameInput
+        , viewInput "password" "Password" model.password PasswordInput
+        , viewInput "password" "Re-enter Password" model.passwordAgain PasswordAgainInput
+        , viewInput "number" "Enter your age" (toString model.age) AgeInput
+        , viewSubmit "Submit" Submit
+        , viewModel model
         , viewValidation model
         ]
 
@@ -79,27 +86,42 @@ viewInput t p v toMsg =
     input [ type_ t, placeholder p, value v, onInput toMsg ] []
 
 
-viewSubmit : String -> Html msg
-viewSubmit text =
-    input [ type_ "submit", value text ] []
+viewSubmit : String -> msg -> Html msg
+viewSubmit cta msg =
+    button [ onClick msg, type_ "button" ] [ text cta ]
+
+
+viewModel : Model -> Html msg
+viewModel model =
+    div []
+        [ div [] [ text "Name: ", text model.name ]
+        , div [] [ text "Password: ", text model.password ]
+        , div [] [ text "Password Again: ", text model.passwordAgain ]
+        , div [] [ text "Age: ", text (toString model.age) ]
+        , div [] [ text "Form Submitted: ", text (toString model.submitted) ]
+        ]
 
 
 viewValidation : Model -> Html msg
 viewValidation model =
-    if isNotLongEnough model.password then
-        div [ style "color" "red" ] [ text "Password must be more than 8 characters long!" ]
+    if model.submitted then
+        if isNotOldEnough model.age then
+            div [ style "color" "red" ] [ text "Age must be greater than 12" ]
 
-    else if isNotStrongEnough model.password then
-        div [ style "color" "red" ] [ text "Password must contain upper case, lower case and numeric characters!" ]
+        else if isNotLongEnough model.password then
+            div [ style "color" "red" ] [ text "Password must be more than 8 characters long!" ]
 
-    else if passwordsDontMatch model.password model.passwordAgain then
-        div [ style "color" "red" ] [ text "Passwords don't match!" ]
+        else if isNotStrongEnough model.password then
+            div [ style "color" "red" ] [ text "Password must contain upper case, lower case and numeric characters!" ]
 
-    else if isNotNumber model.age then
-        div [ style "color" "red" ] [ text "Age must be a number!" ]
+        else if passwordsDontMatch model.password model.passwordAgain then
+            div [ style "color" "red" ] [ text "Passwords don't match!" ]
+
+        else
+            div [ style "color" "green" ] [ text "Validations passed!" ]
 
     else
-        div [ style "color" "green" ] [ text "Validations passed!" ]
+        div [ style "display" "none" ] []
 
 
 isNotLongEnough : String -> Bool
@@ -120,9 +142,9 @@ passwordsDontMatch password passwordAgain =
     password /= passwordAgain
 
 
-isNotNumber : String -> Bool
-isNotNumber age =
-    String.length age == 0 || not (String.all isDigit age)
+isNotOldEnough : Int -> Bool
+isNotOldEnough age =
+    age <= 12
 
 
 isUpperCase : Char -> Bool
