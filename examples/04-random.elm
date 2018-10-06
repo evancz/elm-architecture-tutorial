@@ -2,6 +2,7 @@ module Main exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
 import Browser
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Random
 
@@ -74,6 +75,8 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text (String.fromInt model.dieFace) ]
+        [ p []
+            [ img [ src ("dice/die_face_" ++ String.fromInt model.dieFace ++ ".png") ] []
+            ]
         , button [ onClick Roll ] [ text "Roll" ]
         ]
