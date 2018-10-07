@@ -27,7 +27,7 @@ main =
 
 
 type alias Model =
-    { dieFace : Face
+    { currentFace : DieFace
     , die : Die
     }
 
@@ -48,7 +48,7 @@ type alias Dot =
     }
 
 
-type Face
+type DieFace
     = One
     | Two
     | Three
@@ -81,7 +81,7 @@ init _ =
 
 type Msg
     = Roll
-    | NewFace Int
+    | NewFace DieFace
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,34 +89,11 @@ update msg model =
     case msg of
         Roll ->
             ( model
-            , Random.generate NewFace (Random.int 1 6)
+            , Random.generate NewFace (Random.uniform One [ Two, Three, Four, Five, Six ])
             )
 
         NewFace newFace ->
-            ( let
-                face =
-                    if newFace == 1 then
-                        One
-
-                    else if newFace == 2 then
-                        Two
-
-                    else if newFace == 3 then
-                        Three
-
-                    else if newFace == 4 then
-                        Four
-
-                    else if newFace == 5 then
-                        Five
-
-                    else if newFace == 6 then
-                        Six
-
-                    else
-                        One
-              in
-              { model | dieFace = face }
+            ( { model | currentFace = newFace }
             , Cmd.none
             )
 
@@ -136,30 +113,9 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    let
-        face =
-            case model.dieFace of
-                One ->
-                    1
-
-                Two ->
-                    2
-
-                Three ->
-                    3
-
-                Four ->
-                    4
-
-                Five ->
-                    5
-
-                Six ->
-                    6
-    in
     div []
         [ p []
-            [ diceFacing face model.die
+            [ diceFacing model.currentFace model.die
             ]
         , button [ onClick Roll ] [ Html.text "Roll" ]
         ]
@@ -217,7 +173,7 @@ dieDot die position =
         []
 
 
-diceFacing : Int -> Die -> Html Msg
+diceFacing : DieFace -> Die -> Html Msg
 diceFacing face die =
     Svg.svg
         [ Svg.Attributes.viewBox <|
@@ -228,61 +184,49 @@ diceFacing face die =
         , Svg.Attributes.width <| String.fromInt die.width
         , Svg.Attributes.height <| String.fromInt die.height
         ]
-        (if face == 1 then
-            [ dieRectangle die
-            , dieDot die 5
-            ]
+        (case face of
+            One ->
+                [ dieRectangle die
+                , dieDot die 5
+                ]
 
-         else if face == 2 then
-            [ dieRectangle die
-            , dieDot die 3
-            , dieDot die 7
-            ]
+            Two ->
+                [ dieRectangle die
+                , dieDot die 3
+                , dieDot die 7
+                ]
 
-         else if face == 3 then
-            [ dieRectangle die
-            , dieDot die 3
-            , dieDot die 5
-            , dieDot die 7
-            ]
+            Three ->
+                [ dieRectangle die
+                , dieDot die 3
+                , dieDot die 5
+                , dieDot die 7
+                ]
 
-         else if face == 4 then
-            [ dieRectangle die
-            , dieDot die 1
-            , dieDot die 3
-            , dieDot die 7
-            , dieDot die 9
-            ]
+            Four ->
+                [ dieRectangle die
+                , dieDot die 1
+                , dieDot die 3
+                , dieDot die 7
+                , dieDot die 9
+                ]
 
-         else if face == 5 then
-            [ dieRectangle die
-            , dieDot die 1
-            , dieDot die 3
-            , dieDot die 5
-            , dieDot die 7
-            , dieDot die 9
-            ]
+            Five ->
+                [ dieRectangle die
+                , dieDot die 1
+                , dieDot die 3
+                , dieDot die 5
+                , dieDot die 7
+                , dieDot die 9
+                ]
 
-         else if face == 6 then
-            [ dieRectangle die
-            , dieDot die 1
-            , dieDot die 3
-            , dieDot die 4
-            , dieDot die 6
-            , dieDot die 7
-            , dieDot die 9
-            ]
-
-         else
-            [ dieRectangle die
-            , dieDot die 1
-            , dieDot die 2
-            , dieDot die 3
-            , dieDot die 4
-            , dieDot die 5
-            , dieDot die 6
-            , dieDot die 7
-            , dieDot die 8
-            , dieDot die 9
-            ]
+            Six ->
+                [ dieRectangle die
+                , dieDot die 1
+                , dieDot die 3
+                , dieDot die 4
+                , dieDot die 6
+                , dieDot die 7
+                , dieDot die 9
+                ]
         )
