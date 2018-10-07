@@ -52,14 +52,14 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model 1
         (Die
-            140
-            140
-            "hsl(0, 0%, 80%)"
-            "hsl(0, 0%, 90%)"
+            100
+            100
+            "hsl(0, 0%, 87%)"
+            "hsl(0, 0%, 95%)"
             (Dot
-                10
+                12
                 "hsl(0, 100%, 50%)"
-                "hsl(0, 100%, 40%)"
+                "hsl(0, 90%, 50%)"
             )
         )
     , Cmd.none
@@ -106,17 +106,9 @@ view : Model -> Html Msg
 view model =
     div []
         [ p []
-            [ img [ src ("dice/die_face_" ++ String.fromInt model.dieFace ++ ".png") ] []
+            [ diceFacing model.dieFace model.die
             ]
         , button [ onClick Roll ] [ Html.text "Roll" ]
-        , p []
-            [ diceFacing model.die 1
-            , diceFacing model.die 2
-            , diceFacing model.die 3
-            , diceFacing model.die 4
-            , diceFacing model.die 5
-            , diceFacing model.die 6
-            ]
         ]
 
 
@@ -172,8 +164,8 @@ dieDot die position =
         []
 
 
-diceFacing : Die -> Int -> Html Msg
-diceFacing die face =
+diceFacing : Int -> Die -> Html Msg
+diceFacing face die =
     Svg.svg
         [ Svg.Attributes.viewBox <|
             "0 0 "
@@ -183,20 +175,61 @@ diceFacing die face =
         , Svg.Attributes.width <| String.fromInt die.width
         , Svg.Attributes.height <| String.fromInt die.height
         ]
-        [ if face == 1 then
+        (if face == 1 then
             [ dieRectangle die
             , dieDot die 5
             ]
 
-          else if face == 2 then
+         else if face == 2 then
             [ dieRectangle die
+            , dieDot die 3
             , dieDot die 7
-            , dieDot die 5
             ]
 
-          else
+         else if face == 3 then
             [ dieRectangle die
-            , dieDot die 9
-            , dieDot die 8
+            , dieDot die 3
+            , dieDot die 5
+            , dieDot die 7
             ]
-        ]
+
+         else if face == 4 then
+            [ dieRectangle die
+            , dieDot die 1
+            , dieDot die 3
+            , dieDot die 7
+            , dieDot die 9
+            ]
+
+         else if face == 5 then
+            [ dieRectangle die
+            , dieDot die 1
+            , dieDot die 3
+            , dieDot die 5
+            , dieDot die 7
+            , dieDot die 9
+            ]
+
+         else if face == 6 then
+            [ dieRectangle die
+            , dieDot die 1
+            , dieDot die 3
+            , dieDot die 4
+            , dieDot die 6
+            , dieDot die 7
+            , dieDot die 9
+            ]
+
+         else
+            [ dieRectangle die
+            , dieDot die 1
+            , dieDot die 2
+            , dieDot die 3
+            , dieDot die 4
+            , dieDot die 5
+            , dieDot die 6
+            , dieDot die 7
+            , dieDot die 8
+            , dieDot die 9
+            ]
+        )
