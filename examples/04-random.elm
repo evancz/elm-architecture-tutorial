@@ -89,7 +89,15 @@ update msg model =
     case msg of
         Roll ->
             ( model
-            , Random.generate NewFace (Random.uniform One [ Two, Three, Four, Five, Six ])
+            , Random.generate NewFace
+                (Random.weighted ( 10, One )
+                    [ ( 10, Two )
+                    , ( 10, Three )
+                    , ( 10, Four )
+                    , ( 20, Five )
+                    , ( 40, Six )
+                    ]
+                )
             )
 
         NewFace newFace ->
