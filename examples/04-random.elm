@@ -27,7 +27,7 @@ main =
 
 
 type alias Model =
-    { dieFace : Int
+    { dieFace : Face
     , die : Die
     }
 
@@ -48,9 +48,18 @@ type alias Dot =
     }
 
 
+type Face
+    = One
+    | Two
+    | Three
+    | Four
+    | Five
+    | Six
+
+
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model 1
+    ( Model One
         (Die
             100
             100
@@ -84,7 +93,30 @@ update msg model =
             )
 
         NewFace newFace ->
-            ( { model | dieFace = newFace }
+            ( let
+                face =
+                    if newFace == 1 then
+                        One
+
+                    else if newFace == 2 then
+                        Two
+
+                    else if newFace == 3 then
+                        Three
+
+                    else if newFace == 4 then
+                        Four
+
+                    else if newFace == 5 then
+                        Five
+
+                    else if newFace == 6 then
+                        Six
+
+                    else
+                        One
+              in
+              { model | dieFace = face }
             , Cmd.none
             )
 
@@ -104,9 +136,30 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
+    let
+        face =
+            case model.dieFace of
+                One ->
+                    1
+
+                Two ->
+                    2
+
+                Three ->
+                    3
+
+                Four ->
+                    4
+
+                Five ->
+                    5
+
+                Six ->
+                    6
+    in
     div []
         [ p []
-            [ diceFacing model.dieFace model.die
+            [ diceFacing face model.die
             ]
         , button [ onClick Roll ] [ Html.text "Roll" ]
         ]
