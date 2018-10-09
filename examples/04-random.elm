@@ -27,7 +27,8 @@ main =
 
 
 type alias Model =
-    { currentFace : DieFace
+    { currentFace1 : DieFace
+    , currentFace2 : DieFace
     , die : Die
     }
 
@@ -59,7 +60,9 @@ type DieFace
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model One
+    ( Model
+        One
+        One
         (Die
             100
             100
@@ -81,7 +84,7 @@ init _ =
 
 type Msg
     = Roll
-    | NewFace DieFace
+    | NewFaces ( DieFace, DieFace )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,19 +92,33 @@ update msg model =
     case msg of
         Roll ->
             ( model
-            , Random.generate NewFace
-                (Random.uniform One
-                    [ Two
-                    , Three
-                    , Four
-                    , Five
-                    , Six
-                    ]
-                )
+            , Random.generate NewFaces <|
+                Random.pair
+                    (Random.uniform
+                        One
+                        [ Two
+                        , Three
+                        , Four
+                        , Five
+                        , Six
+                        ]
+                    )
+                    (Random.uniform
+                        One
+                        [ Two
+                        , Three
+                        , Four
+                        , Five
+                        , Six
+                        ]
+                    )
             )
 
-        NewFace newFace ->
-            ( { model | currentFace = newFace }
+        NewFaces ( newFace1, newFace2 ) ->
+            ( { model
+                | currentFace1 = newFace1
+                , currentFace2 = newFace2
+              }
             , Cmd.none
             )
 
@@ -123,7 +140,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ p []
-            [ diceFacing model.currentFace model.die
+            [ diceFacing model.currentFace1 model.die
+            , diceFacing model.currentFace2 model.die
             ]
         , button [ onClick Roll ] [ Html.text "Roll" ]
         ]
