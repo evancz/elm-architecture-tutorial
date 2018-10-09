@@ -92,26 +92,7 @@ update msg model =
     case msg of
         Roll ->
             ( model
-            , Random.generate NewFaces <|
-                Random.pair
-                    (Random.uniform
-                        One
-                        [ Two
-                        , Three
-                        , Four
-                        , Five
-                        , Six
-                        ]
-                    )
-                    (Random.uniform
-                        One
-                        [ Two
-                        , Three
-                        , Four
-                        , Five
-                        , Six
-                        ]
-                    )
+            , rollDice
             )
 
         NewFaces ( newFace1, newFace2 ) ->
@@ -120,6 +101,30 @@ update msg model =
                 , currentFace2 = newFace2
               }
             , Cmd.none
+            )
+
+
+rollDice : Cmd Msg
+rollDice =
+    Random.generate NewFaces <|
+        Random.pair
+            (Random.uniform
+                One
+                [ Two
+                , Three
+                , Four
+                , Five
+                , Six
+                ]
+            )
+            (Random.uniform
+                One
+                [ Two
+                , Three
+                , Four
+                , Five
+                , Six
+                ]
             )
 
 
