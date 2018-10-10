@@ -47,6 +47,7 @@ type Msg
     = Tick Time.Posix
     | AdjustTimeZone Time.Zone
     | Pause
+    | Resume
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,6 +65,11 @@ update msg model =
 
         Pause ->
             ( { model | paused = True }
+            , Cmd.none
+            )
+
+        Resume ->
+            ( { model | paused = False }
             , Cmd.none
             )
 
@@ -103,5 +109,7 @@ view model =
             []
             [ button [ type_ "button", onClick Pause ]
                 [ text "Pause" ]
+            , button [ type_ "button", onClick Resume ]
+                [ text "Resume" ]
             ]
         ]
