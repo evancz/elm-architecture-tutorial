@@ -69,19 +69,25 @@ update msg model =
                         errorMessage =
                             case error of
                                 Http.BadUrl errorString ->
-                                    errorString
+                                    "Invalid URL provided."
 
                                 Http.Timeout ->
-                                    "Timeout"
+                                    "It's taking too much time. Please retry."
 
                                 Http.NetworkError ->
-                                    "Network error"
+                                    "Could not connect to the network. Please check your connection and try again."
 
-                                Http.BadStatus _ ->
-                                    "Bad Status"
+                                Http.BadStatus response ->
+                                    Debug.toString response.status.code
+                                        ++ ": "
+                                        ++ response.status.message
 
-                                Http.BadPayload _ _ ->
-                                    "Bad Payload"
+                                Http.BadPayload message response ->
+                                    let
+                                        _ =
+                                            Debug.log "Response: " response
+                                    in
+                                    "Bad Payload: " ++ message
                     in
                     ( { model | error = errorMessage }
                     , Cmd.none
