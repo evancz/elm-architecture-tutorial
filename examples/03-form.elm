@@ -65,12 +65,12 @@ view model =
     ]
 
 
-viewInput : String -> String -> String -> (String -> msg) -> Html msg
+viewInput : String -> String -> String -> (String -> msg) -> Html Msg
 viewInput t p v toMsg =
   input [ type_ t, placeholder p, value v, onInput toMsg ] []
 
 
-viewValidation : Model -> Html msg
+viewValidation : Model -> Html Msg
 viewValidation model =
   if model.password == model.passwordAgain then
     div [ style "color" "green" ] [ text "OK" ]
