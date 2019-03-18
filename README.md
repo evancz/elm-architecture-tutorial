@@ -2,7 +2,7 @@
 
 [Elm](https://elm-lang.org/) is a programming language that compiles to JavaScript. It is known for its friendly error messages, helping you find issues quickly and refactor large projects with confidence. Elm is also [very fast](https://elm-lang.org/blog/blazing-fast-html-round-two) and [very small](https://elm-lang.org/blog/small-assets-without-the-headache) when compared with React, Angular, Ember, etc.
 
-This repo focuses **The Elm Architecture**, an architecture pattern you see in all Elm programs. It has influenced projects like Redux that borrow core concepts but add many JS-focused ideas.
+This repo focuses on **The Elm Architecture**, an architecture pattern you see in all Elm programs. It has influenced projects like Redux that borrow core concepts but add many JS-focused ideas.
 
 
 ## The Elm Architecture
