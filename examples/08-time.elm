@@ -73,9 +73,14 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  let
-    hour   = String.fromInt (Time.toHour   model.zone model.time)
-    minute = String.fromInt (Time.toMinute model.zone model.time)
-    second = String.fromInt (Time.toSecond model.zone model.time)
-  in
-  h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+    let
+        hour =
+            String.padLeft 2 '0' (String.fromInt (Time.toHour model.zone model.time))
+
+        minute =
+            String.padLeft 2 '0' (String.fromInt (Time.toMinute model.zone model.time))
+
+        second =
+            String.padLeft 2 '0' (String.fromInt (Time.toSecond model.zone model.time))
+    in
+    h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
